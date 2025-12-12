@@ -4,3 +4,10 @@ spring:
   profiles:
     active: dev
     include: secret
+
+  # JPA ?? ??
+  jpa:
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
