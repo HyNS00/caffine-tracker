@@ -1,0 +1,6 @@
+spring:
+  application:
+    name: cafit
+  profiles:
+    active: dev
+    include: secret
