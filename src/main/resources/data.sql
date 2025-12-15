@@ -1,7 +1,4 @@
--- ========================================
--- 기존 잘못된 테이블 삭제
--- ========================================
-DROP TABLE IF EXISTS beverages;
+
 
 -- ========================================
 -- PresetBeverage 초기 데이터
@@ -190,11 +187,3 @@ INSERT INTO preset_beverages (name, brand_name, category, volume_ml, caffeine_mg
 -- 편의점 캔커피: 10개
 -- ========================================
 -- 총: 106개
--- ========================================
-```
-
-**파일명:** `preset_beverages_data.sql`
-
-**사용 방법:**
-```
-src/main/resources/data.sql
