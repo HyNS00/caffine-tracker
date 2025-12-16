@@ -1,9 +1,6 @@
 # Cafit
 
 나에게 맞춤형 카페인 트래커
-
-좋아요. MVP 계획을 전문적으로 짜볼게요.
-
 ---
 
 # CaFit MVP 개발 계획
@@ -331,19 +328,3 @@ implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
 | 통합 | @SpringBootTest |
 
 ---
-
-## 전체 일정 (예상)
-
-| Phase | 예상 기간 | 우선순위 |
-|-------|-----------|----------|
-| Phase 1 | ✅ 완료 | - |
-| Phase 2 | 1일 | 높음 |
-| Phase 3 | 1일 | 높음 |
-| Phase 4 | 1~2일 | 높음 (핵심) |
-| Phase 5 | 1일 | 중간 |
-| Phase 6 | 2일 | 중간 |
-| Phase 7 | 1~2일 | 중간 |
-| Phase 8 | 2~3일 | 낮음 (포트폴리오용) |
-| Phase 9 | 2일 | 낮음 |
-| Phase 10 | 2일 | 중간 |
-
