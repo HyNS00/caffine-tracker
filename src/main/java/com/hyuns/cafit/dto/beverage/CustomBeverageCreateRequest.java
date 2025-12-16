@@ -1,5 +1,6 @@
 package com.hyuns.cafit.dto.beverage;
 
+import com.hyuns.cafit.domain.beverage.BeverageCategory;
 import jakarta.validation.constraints.*;
 
 public record CustomBeverageCreateRequest(
@@ -9,7 +10,7 @@ public record CustomBeverageCreateRequest(
         String name,
 
         @NotNull(message = "카테고리는 필수입니다")
-        String category,
+        BeverageCategory category,
 
         @NotNull(message = "용량은 필수입니다")
         @Positive(message = "용량은 0보다 커야 합니다")
