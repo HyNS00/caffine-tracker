@@ -32,7 +32,10 @@ public enum ErrorMessage {
             "즐겨찾기 음료는 프리셋 또는 커스텀 중 하나만 설정되어야 합니다", HttpStatus.BAD_REQUEST),
 
     // Validation
-    VALIDATION_FAILED("VALIDATION_FAILED", "입력값 검증 실패", HttpStatus.BAD_REQUEST);
+    VALIDATION_FAILED("VALIDATION_FAILED", "입력값 검증 실패", HttpStatus.BAD_REQUEST),
+
+    // System Error
+    INTERNAL_SERVER_ERROR("INTERNAL_SERVER_ERROR", "서버 내부 오류가 발생했습니다", HttpStatus.INTERNAL_SERVER_ERROR);
 
     private final String code;
     private final String message;
