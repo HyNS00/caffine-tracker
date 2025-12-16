@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CaFit - 카페인 섭취 관리</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Cormorant+Garamond:wght@600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<!-- Login Screen -->
+<div id="loginScreen" class="screen active">
+    <div class="login-container">
+        <div class="login-hero">
+            <h1 class="brand-title">CaFit</h1>
+            <p class="brand-subtitle">당신의 카페인, 우리가 관리합니다</p>
+        </div>
+
+        <div class="login-forms">
+            <div class="tab-buttons">
+                <button class="tab-btn active" data-tab="login">로그인</button>
+                <button class="tab-btn" data-tab="signup">회원가입</button>
+            </div>
+
+            <!-- Login Form -->
+            <form id="loginForm" class="auth-form active">
+                <div class="form-group">
+                    <input type="email" id="loginEmail" placeholder="이메일" required>
+                </div>
+                <div class="form-group">
+                    <input type="password" id="loginPassword" placeholder="비밀번호" required>
+                </div>
+                <button type="submit" class="btn-primary">로그인</button>
+                <div id="loginError" class="error-message"></div>
+            </form>
+
+            <!-- Signup Form -->
+            <form id="signupForm" class="auth-form">
+                <div class="form-group">
+                    <input type="text" id="signupName" placeholder="이름" required>
+                </div>
+                <div class="form-group">
+                    <input type="email" id="signupEmail" placeholder="이메일" required>
+                </div>
+                <div class="form-group">
+                    <input type="password" id="signupPassword" placeholder="비밀번호 (4자 이상)" required>
+                </div>
+                <button type="submit" class="btn-primary">가입하기</button>
+                <div id="signupError" class="error-message"></div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Main App Screen -->
+<div id="appScreen" class="screen">
+    <!-- Header -->
+    <header class="app-header">
+        <div class="header-content">
+            <h1 class="app-logo">CaFit</h1>
+            <div class="header-actions">
+                <span id="userName" class="user-name"></span>
+                <button id="logoutBtn" class="btn-ghost">로그아웃</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="app-main">
+        <!-- Today's Summary Card -->
+        <section class="summary-card">
+            <div class="summary-header">
+                <h2>오늘의 카페인</h2>
+                <div class="summary-date" id="todayDate"></div>
+            </div>
+            <div class="summary-stats">
+                <div class="stat-circle">
+                    <svg viewBox="0 0 200 200" class="progress-ring">
+                        <circle cx="100" cy="100" r="85" class="progress-ring-bg"></circle>
+                        <circle cx="100" cy="100" r="85" class="progress-ring-fill" id="caffeineProgress"></circle>
+                    </svg>
+                    <div class="stat-content">
+                        <div class="stat-value" id="totalCaffeine">0</div>
+                        <div class="stat-unit">mg</div>
+                    </div>
+                </div>
+                <div class="stat-info">
+                    <div class="stat-item">
+                        <span class="stat-label">일일 권장량</span>
+                        <span class="stat-data">400mg</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">섭취 횟수</span>
+                        <span class="stat-data" id="intakeCount">0회</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Beverage Selection -->
+        <section class="beverage-section">
+            <div class="section-header">
+                <h2>음료 선택</h2>
+            </div>
+
+            <!-- Beverage Tabs -->
+            <div class="beverage-tabs">
+                <button class="beverage-tab-btn active" data-tab="preset">음료 검색</button>
+                <button class="beverage-tab-btn" data-tab="custom">내 음료</button>
+            </div>
+
+            <!-- Preset Beverages Tab -->
+            <div id="presetTab" class="beverage-tab-content active">
+                <div class="search-box-large">
+                    <input type="text" id="beverageSearch" placeholder="음료 이름 또는 브랜드를 검색하세요... (예: 스타벅스, 아메리카노)">
+                    <button id="searchBtn" class="btn-search">검색</button>
+                </div>
+                <div class="beverage-grid" id="beverageGrid">
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🔍</div>
+                        <p>음료를 검색해보세요</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Custom Beverages Tab -->
+            <div id="customTab" class="beverage-tab-content">
+                <div class="custom-header">
+                    <button id="addCustomBtn" class="btn-primary">+ 나만의 음료 추가</button>
+                </div>
+                <div class="beverage-grid" id="customBeverageGrid">
+                    <!-- Custom beverage cards will be inserted here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Today's Intakes -->
+        <section class="intakes-section">
+            <h2>오늘 마신 기록</h2>
+            <div class="intakes-timeline" id="intakesTimeline">
+                <!-- Intake items will be inserted here -->
+            </div>
+        </section>
+    </main>
+</div>
+
+<!-- Intake Modal -->
+<div id="intakeModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>섭취 기록</h3>
+            <button class="modal-close">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="selected-beverage" id="selectedBeverageInfo"></div>
+            <div class="form-group">
+                <label>섭취 시간</label>
+                <input type="datetime-local" id="consumedAtInput">
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button id="confirmIntakeBtn" class="btn-primary">기록하기</button>
+            <button class="btn-secondary modal-close">취소</button>
+        </div>
+    </div>
+</div>
+
+<!-- Custom Beverage Modal -->
+<div id="customBeverageModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="customModalTitle">나만의 음료 추가</h3>
+            <button class="modal-close">&times;</button>
+        </div>
+        <div class="modal-body">
+            <form id="customBeverageForm">
+                <div class="form-group">
+                    <label>음료 이름 *</label>
+                    <input type="text" id="customName" placeholder="예: 나만의 라떼" required>
+                </div>
+                <div class="form-group">
+                    <label>카테고리 *</label>
+                    <select id="customCategory" required>
+                        <option value="">선택하세요</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>용량 (ml) *</label>
+                        <input type="number" id="customVolume" placeholder="355" min="1" max="10000" required>
+                    </div>
+                    <div class="form-group">
+                        <label>카페인 (mg) *</label>
+                        <input type="number" id="customCaffeine" placeholder="150" min="0" step="0.1" required>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button id="saveCustomBtn" class="btn-primary">저장</button>
+            <button class="btn-secondary modal-close">취소</button>
+        </div>
+    </div>
+</div>
+
+<script src="/js/api.js"></script>
+<script src="/js/auth.js"></script>
+<script src="/js/app.js"></script>
+</body>
+</html>
