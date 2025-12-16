@@ -404,11 +404,13 @@ function updateSummaryStats() {
 
     // 색상 변경 (과다 섭취 시 경고색)
     if (percentage > 100) {
-        progressRing.style.stroke = '#E57373';
+        progressRing.style.stroke = '#E57373';  // 빨간색
     } else if (percentage > 80) {
-        progressRing.style.stroke = '#FFC857';
+        progressRing.style.stroke = '#FF9800';  // 주황색
+    } else if (percentage > 50) {
+        progressRing.style.stroke = '#FFC857';  // 노란색
     } else {
-        progressRing.style.stroke = '#FFC857';
+        progressRing.style.stroke = '#4CAF50';  // 녹색
     }
 }
 
