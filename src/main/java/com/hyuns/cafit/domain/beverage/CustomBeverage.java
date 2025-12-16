@@ -56,6 +56,12 @@ public class CustomBeverage {
         return new CustomBeverage(user, name, category, volumeMl, caffeineMg);
     }
 
+    public void update(String name, int volumeMl, double caffeineMg) {
+        this.name = name;
+        this.volumeMl = volumeMl;
+        this.caffeineMg = caffeineMg;
+    }
+
     public String getDisplayName() {
         return String.format("%s (%dml)", name, volumeMl);
     }
