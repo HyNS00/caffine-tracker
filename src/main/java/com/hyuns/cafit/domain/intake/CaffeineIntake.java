@@ -91,4 +91,8 @@ public class CaffeineIntake {
         return String.format("%s %dml - %.0fmg", beverageName, volumeMl, caffeineMg);
     }
 
+    public boolean isOwnedBy(User user) {
+        return this.user.equals(user);
+    }
+
 }
