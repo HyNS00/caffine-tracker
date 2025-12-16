@@ -59,6 +59,10 @@ public class User {
         this.targetSleepCaffeine = 50.0;
     }
 
+    public boolean isPasswordMatch(String rawPassword) {
+        return this.password.equals(rawPassword);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
