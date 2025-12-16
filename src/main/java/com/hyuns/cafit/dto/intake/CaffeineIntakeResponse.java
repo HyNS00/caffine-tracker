@@ -4,7 +4,7 @@ import com.hyuns.cafit.domain.intake.CaffeineIntake;
 
 import java.time.LocalDateTime;
 
-public record IntakeResponse(
+public record CaffeineIntakeResponse(
         Long id,
         String beverageName,
         String brandName,
@@ -14,8 +14,8 @@ public record IntakeResponse(
         LocalDateTime consumedAt,
         String displayName
 ) {
-    public static IntakeResponse from(CaffeineIntake intake) {
-        return new IntakeResponse(
+    public static CaffeineIntakeResponse from(CaffeineIntake intake) {
+        return new CaffeineIntakeResponse(
                 intake.getId(),
                 intake.getBeverageName(),
                 intake.getBrandName(),

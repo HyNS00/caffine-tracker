@@ -4,7 +4,7 @@ import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDateTime;
 
-public record IntakeCreateRequest(
+public record CaffeineIntakeCreateRequest(
         @NotNull(message = "섭취 시간은 필수입니다")
         LocalDateTime consumedAt
 ) {}
