@@ -51,13 +51,9 @@ public class CustomBeverage {
             String name,
             BeverageCategory category,
             int volumeMl,
-            Double caffeineMg) {
+            double caffeineMg) {
 
-        double finalCaffeine = (caffeineMg != null)
-                ? caffeineMg
-                : category.calculateCaffeineForVolume(volumeMl);
-
-        return new CustomBeverage(user, name, category, volumeMl, finalCaffeine);
+        return new CustomBeverage(user, name, category, volumeMl, caffeineMg);
     }
 
     public String getDisplayName() {
