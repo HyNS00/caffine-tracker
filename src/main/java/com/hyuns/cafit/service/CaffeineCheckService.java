@@ -20,6 +20,8 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 
+import static com.hyuns.cafit.util.NumberUtils.round;
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -134,7 +136,5 @@ public class CaffeineCheckService {
                 .sum();
     }
 
-    private double round(double value) {
-        return Math.round(value * 10) / 10.0;
-    }
+
 }
