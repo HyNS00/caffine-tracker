@@ -38,27 +38,11 @@ public class CaffeineCheckService {
     public CurrentCaffeineResponse getCurrentStatus(User user) {
         LocalDateTime now = LocalDateTime.now(clock);
         List<CaffeineIntake> intakes = getRecentIntakes(user, now);
-
-        double currentMg = decayCalculator.caffeineLevelAt(intakes, now, user.getCaffeineHalfLife());
-        double predictedAtBedtimeMg = calculatePredictedAtBedtime(user, intakes, now, 0);
         double todayTotalMg = getTodayTotalIntake(user);
-        double hoursUntilBedtime = calculateHoursUntilBedtime(user, now);
 
-        CaffeineStatus status = new CaffeineStatus(
-                round(currentMg),
-                round(predictedAtBedtimeMg),
-                round(todayTotalMg),
-                round(hoursUntilBedtime)
-        );
-
+        CaffeineStatus status = buildCaffeineStatus(user, intakes, now, todayTotalMg, 0);
         UserCaffeineSettings settings = UserCaffeineSettings.from(user);
-
-        DrinkRecommendation recommendation = DrinkRecommendation.determine(
-                todayTotalMg,
-                user.getDailyCaffeineLimit(),
-                predictedAtBedtimeMg,
-                user.getTargetSleepCaffeine()
-        );
+        DrinkRecommendation recommendation = determineRecommendation(user, status);
 
         return new CurrentCaffeineResponse(status, settings, recommendation);
     }
