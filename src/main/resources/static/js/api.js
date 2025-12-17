@@ -7,12 +7,11 @@ async function fetchAPI(url, options = {}) {
         headers: {
             'Content-Type': 'application/json',
         },
-        credentials: 'include', // 세션 쿠키 포함
+        credentials: 'include',
     };
 
     const response = await fetch(url, { ...defaultOptions, ...options });
 
-    // 401 Unauthorized - 로그인 화면으로 이동
     if (response.status === 401) {
         sessionStorage.removeItem('user');
         window.location.href = '/';
@@ -24,7 +23,6 @@ async function fetchAPI(url, options = {}) {
         throw new Error(error.message || '요청 실패');
     }
 
-    // 204 No Content는 빈 응답
     if (response.status === 204) {
         return null;
     }
@@ -47,6 +45,8 @@ const AuthAPI = {
     logout: () => fetchAPI(`${API_BASE}/auth/logout`, {
         method: 'POST',
     }),
+
+    me: () => fetchAPI(`${API_BASE}/auth/me`),
 };
 
 // Beverage API
@@ -98,16 +98,20 @@ const CustomBeverageAPI = {
 
 // Caffeine Check API
 const CaffeineAPI = {
-    // 현재 카페인 상태 조회
     getStatus: () => fetchAPI(`${API_BASE}/caffeine/status`),
 
-    // PresetBeverage 마셔도 되는지 체크
     checkPreset: (beverageId) => fetchAPI(`${API_BASE}/caffeine/check/preset/${beverageId}`, {
         method: 'POST',
     }),
 
-    // CustomBeverage 마셔도 되는지 체크
     checkCustom: (beverageId) => fetchAPI(`${API_BASE}/caffeine/check/custom/${beverageId}`, {
         method: 'POST',
     }),
+};
+
+// Statistics API (신규 추가)
+const StatisticsAPI = {
+    getTimeline: (hours = 12) => fetchAPI(`${API_BASE}/statistics/timeline?hours=${hours}`),
+
+    getDailyStatistics: (days = 7) => fetchAPI(`${API_BASE}/statistics/daily?days=${days}`),
 };

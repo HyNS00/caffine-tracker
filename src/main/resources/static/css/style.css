@@ -14,7 +14,6 @@
     --shadow-md: 0 4px 16px rgba(44, 110, 73, 0.12);
     --shadow-lg: 0 8px 32px rgba(44, 110, 73, 0.16);
 
-    /* 상태 색상 */
     --safe: #4CAF50;
     --safe-bg: #E8F5E9;
     --warning: #FF9800;
@@ -38,7 +37,6 @@ body {
     overflow-x: hidden;
 }
 
-/* Screen Management */
 .screen {
     display: none;
     animation: fadeIn 0.5s ease-out;
@@ -53,7 +51,7 @@ body {
     to { opacity: 1; transform: translateY(0); }
 }
 
-/* Login Screen */
+/* ========== Login Screen ========== */
 .login-container {
     min-height: 100vh;
     display: flex;
@@ -227,7 +225,7 @@ body {
     75% { transform: translateX(10px); }
 }
 
-/* App Header */
+/* ========== App Header ========== */
 .app-header {
     background: var(--bg-card);
     box-shadow: var(--shadow-sm);
@@ -264,6 +262,26 @@ body {
     font-weight: 500;
 }
 
+.btn-menu {
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-main);
+    border: none;
+    border-radius: 12px;
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: var(--primary);
+}
+
+.btn-menu:hover {
+    background: var(--primary);
+    color: white;
+}
+
 .btn-ghost {
     padding: 0.625rem 1.25rem;
     background: transparent;
@@ -280,19 +298,115 @@ body {
     color: white;
 }
 
-/* Main Content */
+/* ========== Sidebar ========== */
+.sidebar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    z-index: 200;
+}
+
+.sidebar-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.sidebar {
+    position: fixed;
+    top: 0;
+    right: -320px;
+    width: 320px;
+    height: 100%;
+    background: var(--bg-card);
+    box-shadow: var(--shadow-lg);
+    transition: right 0.3s ease;
+    z-index: 201;
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar.active {
+    right: 0;
+}
+
+.sidebar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.sidebar-header h2 {
+    font-size: 1.25rem;
+    color: var(--primary);
+}
+
+.sidebar-close {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: var(--text-light);
+    cursor: pointer;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.sidebar-close:hover {
+    background: var(--bg-main);
+    color: var(--text-primary);
+}
+
+.sidebar-nav {
+    flex: 1;
+    padding: 1rem;
+}
+
+.sidebar-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.5rem;
+    color: var(--text-primary);
+    text-decoration: none;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    margin-bottom: 0.5rem;
+}
+
+.sidebar-item:hover {
+    background: var(--bg-main);
+    color: var(--primary);
+}
+
+.sidebar-icon {
+    font-size: 1.25rem;
+}
+
+/* ========== Main Content ========== */
 .app-main {
     max-width: 1200px;
     margin: 0 auto;
     padding: 2rem;
 }
 
-/* Summary Card */
+/* ========== Summary Card ========== */
 .summary-card {
     background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
     border-radius: 24px;
     padding: 2.5rem;
-    margin-bottom: 3rem;
+    margin-bottom: 2rem;
     box-shadow: var(--shadow-lg);
     color: white;
     position: relative;
@@ -408,7 +522,6 @@ body {
     font-weight: 600;
 }
 
-/* Bedtime Prediction */
 .bedtime-card {
     display: flex;
     align-items: center;
@@ -452,46 +565,73 @@ body {
     opacity: 0.7;
 }
 
-/* Recommendation Badge */
-.recommendation-badge {
-    display: inline-flex;
+/* ========== Chart Section ========== */
+.chart-section {
+    margin-bottom: 2rem;
+}
+
+.chart-card {
+    background: var(--bg-card);
+    border-radius: 20px;
+    padding: 1.5rem;
+    box-shadow: var(--shadow-sm);
+}
+
+.chart-header {
+    display: flex;
+    justify-content: space-between;
     align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem 1rem;
-    border-radius: 50px;
+    margin-bottom: 1rem;
+}
+
+.chart-header h3 {
+    font-size: 1.25rem;
+    color: var(--text-primary);
     font-weight: 600;
+}
+
+.chart-subtitle {
     font-size: 0.875rem;
+    color: var(--text-light);
 }
 
-.badge-safe {
-    background: var(--safe-bg);
-    color: var(--safe);
+.chart-wrapper {
+    position: relative;
+    height: 250px;
 }
 
-.badge-warning {
-    background: var(--warning-bg);
-    color: var(--warning);
+.chart-legend {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
 }
 
-.badge-danger {
-    background: var(--danger-bg);
-    color: var(--danger);
-}
-
-.badge-icon {
-    width: 20px;
-    height: 20px;
+.legend-item {
     display: flex;
     align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    background: currentColor;
-    color: white;
-    font-size: 0.75rem;
-    font-weight: 700;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    color: var(--text-secondary);
 }
 
-/* Beverage Section */
+.legend-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+}
+
+.legend-dot.caffeine {
+    background: var(--primary);
+}
+
+.legend-dot.target {
+    background: var(--danger);
+}
+
+/* ========== Beverage Section ========== */
 .beverage-section {
     margin-bottom: 3rem;
 }
@@ -508,7 +648,6 @@ body {
     color: var(--primary);
 }
 
-/* Beverage Tabs */
 .beverage-tabs {
     display: flex;
     gap: 1rem;
@@ -551,7 +690,6 @@ body {
     animation: fadeIn 0.3s ease-out;
 }
 
-/* Search Box */
 .search-box-large {
     display: flex;
     gap: 1rem;
@@ -591,14 +729,12 @@ body {
     box-shadow: var(--shadow-md);
 }
 
-/* Custom Header */
 .custom-header {
     margin-bottom: 2rem;
     display: flex;
     justify-content: flex-end;
 }
 
-/* Beverage Grid */
 .beverage-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -606,7 +742,6 @@ body {
     min-height: 200px;
 }
 
-/* Grouped Beverage Card */
 .beverage-card-grouped {
     background: var(--bg-card);
     border-radius: 20px;
@@ -660,7 +795,6 @@ body {
     color: var(--text-primary);
 }
 
-/* Size Selector */
 .size-selector {
     display: flex;
     gap: 0.5rem;
@@ -703,7 +837,6 @@ body {
     opacity: 0.8;
 }
 
-/* Custom Info */
 .custom-info {
     display: flex;
     align-items: center;
@@ -735,7 +868,6 @@ body {
     background: var(--border);
 }
 
-/* Drink Button */
 .btn-drink {
     display: flex;
     align-items: center;
@@ -761,7 +893,6 @@ body {
     font-size: 1.25rem;
 }
 
-/* Card Actions */
 .beverage-card-actions {
     position: absolute;
     top: 1rem;
@@ -799,7 +930,7 @@ body {
     background: var(--danger);
 }
 
-/* Drink Check Modal Styles */
+/* ========== Drink Check Modal ========== */
 .drink-check-result {
     display: flex;
     flex-direction: column;
@@ -829,7 +960,6 @@ body {
     border-radius: 50px;
 }
 
-/* Caffeine Comparison */
 .caffeine-comparison {
     display: flex;
     align-items: center;
@@ -903,7 +1033,6 @@ body {
     flex-shrink: 0;
 }
 
-/* Result Message */
 .result-message {
     display: flex;
     align-items: center;
@@ -956,20 +1085,7 @@ body {
     color: white;
 }
 
-.result-icon {
-    width: 28px;
-    height: 28px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    background: currentColor;
-    color: white;
-    font-size: 0.875rem;
-    font-weight: 700;
-}
-
-/* Intakes Section */
+/* ========== Intakes Section ========== */
 .intakes-section {
     margin-bottom: 3rem;
 }
@@ -986,7 +1102,6 @@ body {
     gap: 0.75rem;
 }
 
-/* Modern Intake Item */
 .intake-item-modern {
     display: flex;
     align-items: center;
@@ -1071,7 +1186,7 @@ body {
     opacity: 0.3;
 }
 
-/* Modal */
+/* ========== Modal ========== */
 .modal {
     display: none;
     position: fixed;
@@ -1100,6 +1215,10 @@ body {
     animation: scaleUp 0.3s ease-out;
     max-height: 90vh;
     overflow-y: auto;
+}
+
+.modal-content.modal-large {
+    max-width: 700px;
 }
 
 .modal-header {
@@ -1175,7 +1294,57 @@ body {
     color: white;
 }
 
-/* Responsive */
+/* ========== Weekly Stats Modal ========== */
+.weekly-chart-wrapper {
+    height: 300px;
+    margin-bottom: 1.5rem;
+}
+
+.weekly-summary {
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+}
+
+.summary-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+}
+
+.summary-item {
+    text-align: center;
+    padding: 1rem;
+    background: var(--bg-main);
+    border-radius: 12px;
+}
+
+.summary-item.warning {
+    background: var(--warning-bg);
+}
+
+.summary-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--primary);
+}
+
+.summary-value span {
+    font-size: 0.875rem;
+    font-weight: 400;
+    color: var(--text-secondary);
+}
+
+.summary-item.warning .summary-value {
+    color: var(--warning);
+}
+
+.summary-label {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    margin-top: 0.25rem;
+}
+
+/* ========== Responsive ========== */
 @media (max-width: 768px) {
     .brand-title {
         font-size: 3.5rem;
@@ -1209,5 +1378,14 @@ body {
 
     .intake-content {
         flex-basis: calc(100% - 100px);
+    }
+
+    .sidebar {
+        width: 100%;
+        right: -100%;
+    }
+
+    .summary-grid {
+        grid-template-columns: repeat(2, 1fr);
     }
 }

@@ -7,6 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Cormorant+Garamond:wght@600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
@@ -62,10 +63,37 @@
             <h1 class="app-logo">CaFit</h1>
             <div class="header-actions">
                 <span id="userName" class="user-name"></span>
-                <button id="logoutBtn" class="btn-ghost">로그아웃</button>
+                <button id="menuBtn" class="btn-menu">☰</button>
             </div>
         </div>
     </header>
+
+    <!-- Sidebar -->
+    <div id="sidebarOverlay" class="sidebar-overlay"></div>
+    <aside id="sidebar" class="sidebar">
+        <div class="sidebar-header">
+            <h2>메뉴</h2>
+            <button id="sidebarClose" class="sidebar-close">&times;</button>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="#" class="sidebar-item" id="menuProfile">
+                <span class="sidebar-icon">👤</span>
+                <span>프로필</span>
+            </a>
+            <a href="#" class="sidebar-item" id="menuStats">
+                <span class="sidebar-icon">📊</span>
+                <span>주간 통계</span>
+            </a>
+            <a href="#" class="sidebar-item" id="menuSettings">
+                <span class="sidebar-icon">⚙️</span>
+                <span>설정</span>
+            </a>
+            <a href="#" class="sidebar-item" id="sidebarLogout">
+                <span class="sidebar-icon">🚪</span>
+                <span>로그아웃</span>
+            </a>
+        </nav>
+    </aside>
 
     <!-- Main Content -->
     <main class="app-main">
@@ -89,12 +117,36 @@
                 <div class="stat-info">
                     <div class="stat-item">
                         <span class="stat-label">일일 권장량</span>
-                        <span class="stat-data">400mg</span>
+                        <span class="stat-data" id="dailyLimit">400mg</span>
                     </div>
                     <div class="stat-item">
                         <span class="stat-label">섭취 횟수</span>
                         <span class="stat-data" id="intakeCount">0회</span>
                     </div>
+                </div>
+            </div>
+            <div id="bedtimePrediction"></div>
+        </section>
+
+        <!-- Timeline Chart Section -->
+        <section class="chart-section">
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h3>체내 카페인 추이</h3>
+                    <span class="chart-subtitle">향후 12시간 예측</span>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="caffeineChart"></canvas>
+                </div>
+                <div class="chart-legend">
+                    <span class="legend-item">
+                        <span class="legend-dot caffeine"></span>
+                        체내 카페인
+                    </span>
+                    <span class="legend-item">
+                        <span class="legend-dot target"></span>
+                        목표 수면 카페인
+                    </span>
                 </div>
             </div>
         </section>
@@ -131,7 +183,6 @@
                     <button id="addCustomBtn" class="btn-primary">+ 나만의 음료 추가</button>
                 </div>
                 <div class="beverage-grid" id="customBeverageGrid">
-                    <!-- Custom beverage cards will be inserted here -->
                 </div>
             </div>
         </section>
@@ -140,10 +191,27 @@
         <section class="intakes-section">
             <h2>오늘 마신 기록</h2>
             <div class="intakes-timeline" id="intakesTimeline">
-                <!-- Intake items will be inserted here -->
             </div>
         </section>
     </main>
+</div>
+
+<!-- Weekly Stats Modal -->
+<div id="weeklyStatsModal" class="modal">
+    <div class="modal-content modal-large">
+        <div class="modal-header">
+            <h3>📊 주간 통계</h3>
+            <button class="modal-close">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="weekly-chart-wrapper">
+                <canvas id="weeklyChart"></canvas>
+            </div>
+            <div class="weekly-summary" id="weeklySummary">
+                <!-- 통계 요약 표시 -->
+            </div>
+        </div>
+    </div>
 </div>
 
 <!-- Intake Modal -->

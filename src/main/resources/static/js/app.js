@@ -6,6 +6,10 @@ let todayIntakes = [];
 let selectedBeverage = null;
 let editingCustomBeverage = null;
 let currentCaffeineStatus = null;
+let timelineData = null;
+let dailyStatsData = null;
+let caffeineChart = null;
+let weeklyChart = null;
 
 // 앱 초기화
 async function initApp() {
@@ -14,10 +18,12 @@ async function initApp() {
     await loadCaffeineStatus();
     await loadCustomBeverages();
     await loadTodayIntakes();
+    await loadTimeline();
     setupTabListeners();
     setupSearchListener();
     setupCustomBeverageListeners();
     setupModalListeners();
+    setupSidebar();
 }
 
 // 오늘 날짜 표시
@@ -27,7 +33,200 @@ function updateTodayDate() {
     document.getElementById('todayDate').textContent = today.toLocaleDateString('ko-KR', options);
 }
 
+// ========================================
+// 사이드바 설정
+// ========================================
+function setupSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const sidebarOverlay = document.getElementById('sidebarOverlay');
+    const menuBtn = document.getElementById('menuBtn');
+    const sidebarClose = document.getElementById('sidebarClose');
+    const sidebarLogout = document.getElementById('sidebarLogout');
+
+    function openSidebar() {
+        sidebar.classList.add('active');
+        sidebarOverlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeSidebar() {
+        sidebar.classList.remove('active');
+        sidebarOverlay.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    menuBtn?.addEventListener('click', openSidebar);
+    sidebarClose?.addEventListener('click', closeSidebar);
+    sidebarOverlay?.addEventListener('click', closeSidebar);
+
+    // 사이드바 로그아웃
+    sidebarLogout?.addEventListener('click', async () => {
+        try {
+            await AuthAPI.logout();
+            sessionStorage.removeItem('user');
+            closeSidebar();
+            showLoginScreen();
+        } catch (error) {
+            console.error('로그아웃 실패:', error);
+        }
+    });
+
+    // 주간 통계 메뉴
+    document.getElementById('menuStats')?.addEventListener('click', async (e) => {
+        e.preventDefault();
+        closeSidebar();
+        await openWeeklyStatsModal();
+    });
+
+    // 프로필 메뉴
+    document.getElementById('menuProfile')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        closeSidebar();
+        alert('프로필 기능은 준비 중입니다.');
+    });
+
+    // 설정 메뉴
+    document.getElementById('menuSettings')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        closeSidebar();
+        alert('설정 기능은 준비 중입니다.');
+    });
+}
+
+// ========================================
+// 주간 통계 모달
+// ========================================
+async function openWeeklyStatsModal() {
+    const modal = document.getElementById('weeklyStatsModal');
+    modal.classList.add('active');
+
+    try {
+        dailyStatsData = await StatisticsAPI.getDailyStatistics(7);
+        renderWeeklyChart();
+        renderWeeklySummary();
+    } catch (error) {
+        console.error('주간 통계 로드 실패:', error);
+    }
+}
+
+function renderWeeklyChart() {
+    const ctx = document.getElementById('weeklyChart');
+    if (!ctx || !dailyStatsData) return;
+
+    if (weeklyChart) {
+        weeklyChart.destroy();
+    }
+
+    const { dailyStats, dailyLimit } = dailyStatsData;
+
+    const labels = dailyStats.map(stat => {
+        const date = new Date(stat.date);
+        return date.toLocaleDateString('ko-KR', { weekday: 'short', month: 'numeric', day: 'numeric' });
+    });
+
+    const data = dailyStats.map(stat => Math.round(stat.totalCaffeineMg));
+
+    weeklyChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: '일일 섭취량',
+                    data: data,
+                    backgroundColor: data.map(v => v > dailyLimit ? 'rgba(229, 115, 115, 0.8)' : 'rgba(44, 110, 73, 0.8)'),
+                    borderColor: data.map(v => v > dailyLimit ? '#E57373' : '#2C6E49'),
+                    borderWidth: 2,
+                    borderRadius: 8,
+                },
+                {
+                    label: '권장량',
+                    data: Array(dailyStats.length).fill(dailyLimit),
+                    type: 'line',
+                    borderColor: '#FF9800',
+                    borderWidth: 2,
+                    borderDash: [5, 5],
+                    pointRadius: 0,
+                    fill: false,
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        usePointStyle: true,
+                        padding: 20,
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return `${context.dataset.label}: ${context.raw}mg`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.05)',
+                    },
+                    ticks: {
+                        callback: function(value) {
+                            return value + 'mg';
+                        }
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false,
+                    }
+                }
+            }
+        }
+    });
+}
+
+function renderWeeklySummary() {
+    const container = document.getElementById('weeklySummary');
+    if (!container || !dailyStatsData) return;
+
+    const { dailyStats, periodAverage, dailyLimit } = dailyStatsData;
+
+    const totalIntakes = dailyStats.reduce((sum, s) => sum + s.intakeCount, 0);
+    const maxDay = dailyStats.reduce((max, s) => s.totalCaffeineMg > max.totalCaffeineMg ? s : max, dailyStats[0]);
+    const overLimitDays = dailyStats.filter(s => s.totalCaffeineMg > dailyLimit).length;
+
+    container.innerHTML = `
+        <div class="summary-grid">
+            <div class="summary-item">
+                <div class="summary-value">${Math.round(periodAverage)}<span>mg</span></div>
+                <div class="summary-label">일평균 섭취량</div>
+            </div>
+            <div class="summary-item">
+                <div class="summary-value">${totalIntakes}<span>회</span></div>
+                <div class="summary-label">총 섭취 횟수</div>
+            </div>
+            <div class="summary-item ${overLimitDays > 0 ? 'warning' : ''}">
+                <div class="summary-value">${overLimitDays}<span>일</span></div>
+                <div class="summary-label">권장량 초과일</div>
+            </div>
+            <div class="summary-item">
+                <div class="summary-value">${Math.round(maxDay.totalCaffeineMg)}<span>mg</span></div>
+                <div class="summary-label">최대 섭취일</div>
+            </div>
+        </div>
+    `;
+}
+
+// ========================================
 // 카페인 상태 로드
+// ========================================
 async function loadCaffeineStatus() {
     try {
         currentCaffeineStatus = await CaffeineAPI.getStatus();
@@ -37,26 +236,18 @@ async function loadCaffeineStatus() {
     }
 }
 
-// 카페인 상태 UI 업데이트
 function updateCaffeineStatusUI() {
     if (!currentCaffeineStatus) return;
 
     const { status, settings, recommendation } = currentCaffeineStatus;
 
-    // 현재 체내 카페인 표시
     document.getElementById('totalCaffeine').textContent = Math.round(status.currentMg);
+    document.getElementById('dailyLimit').textContent = `${settings.dailyLimitMg}mg`;
 
-    // 프로그레스 링 업데이트
     updateProgressRing(status.todayTotalMg, settings.dailyLimitMg);
-
-    // 취침 시 예상 표시
     updateBedtimePrediction(status.predictedAtBedtimeMg, settings.targetSleepCaffeineMg, status.hoursUntilBedtime);
-
-    // 상태 배지 업데이트
-    updateRecommendationBadge(recommendation);
 }
 
-// 프로그레스 링 업데이트
 function updateProgressRing(currentMg, limitMg) {
     const percentage = Math.min((currentMg / limitMg) * 100, 100);
     const circumference = 534.07;
@@ -65,7 +256,6 @@ function updateProgressRing(currentMg, limitMg) {
     const progressRing = document.getElementById('caffeineProgress');
     progressRing.style.strokeDashoffset = offset;
 
-    // 색상 변경
     if (percentage > 100) {
         progressRing.style.stroke = '#E57373';
     } else if (percentage > 80) {
@@ -77,7 +267,6 @@ function updateProgressRing(currentMg, limitMg) {
     }
 }
 
-// 취침 시 예상 카페인 표시
 function updateBedtimePrediction(predictedMg, targetMg, hoursUntilBedtime) {
     const element = document.getElementById('bedtimePrediction');
     if (element) {
@@ -97,23 +286,148 @@ function updateBedtimePrediction(predictedMg, targetMg, hoursUntilBedtime) {
     }
 }
 
-// 상태 배지 업데이트
-function updateRecommendationBadge(recommendation) {
-    const badge = document.getElementById('recommendationBadge');
-    if (!badge) return;
-
-    const config = {
-        'SAFE': { class: 'badge-safe', text: '안전', icon: '✓' },
-        'WARNING': { class: 'badge-warning', text: '주의', icon: '!' },
-        'DANGER': { class: 'badge-danger', text: '위험', icon: '✕' }
-    };
-
-    const { class: badgeClass, text, icon } = config[recommendation] || config['SAFE'];
-    badge.className = `recommendation-badge ${badgeClass}`;
-    badge.innerHTML = `<span class="badge-icon">${icon}</span><span class="badge-text">${text}</span>`;
+// ========================================
+// 타임라인 차트 (Chart.js 꺾은선 그래프)
+// ========================================
+async function loadTimeline() {
+    try {
+        timelineData = await StatisticsAPI.getTimeline(12);
+        renderCaffeineChart();
+    } catch (error) {
+        console.error('타임라인 로드 실패:', error);
+    }
 }
 
-// 카테고리 로드
+function renderCaffeineChart() {
+    const ctx = document.getElementById('caffeineChart');
+    if (!ctx || !timelineData) return;
+
+    if (caffeineChart) {
+        caffeineChart.destroy();
+    }
+
+    const { dataPoints, targetSleepCaffeine, bedtime } = timelineData;
+
+    const labels = dataPoints.map(point => {
+        const time = new Date(point.time);
+        return `${time.getHours()}시`;
+    });
+
+    const caffeineValues = dataPoints.map(point => Math.round(point.caffeineMg * 10) / 10);
+    const targetLine = Array(dataPoints.length).fill(targetSleepCaffeine);
+
+    // 취침 시간 인덱스 찾기
+    const bedtimeHour = new Date(bedtime).getHours();
+    const bedtimeIndex = dataPoints.findIndex(point => {
+        const hour = new Date(point.time).getHours();
+        return hour === bedtimeHour;
+    });
+
+    caffeineChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: '체내 카페인',
+                    data: caffeineValues,
+                    borderColor: '#2C6E49',
+                    backgroundColor: 'rgba(44, 110, 73, 0.1)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 4,
+                    pointBackgroundColor: '#2C6E49',
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2,
+                    pointHoverRadius: 6,
+                },
+                {
+                    label: '목표 수면 카페인',
+                    data: targetLine,
+                    borderColor: '#E57373',
+                    borderWidth: 2,
+                    borderDash: [5, 5],
+                    pointRadius: 0,
+                    fill: false,
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: {
+                intersect: false,
+                mode: 'index',
+            },
+            plugins: {
+                legend: {
+                    display: false,
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(45, 48, 71, 0.9)',
+                    titleColor: '#fff',
+                    bodyColor: '#fff',
+                    padding: 12,
+                    cornerRadius: 8,
+                    callbacks: {
+                        label: function(context) {
+                            if (context.datasetIndex === 0) {
+                                return `카페인: ${context.raw}mg`;
+                            }
+                            return `목표: ${context.raw}mg`;
+                        }
+                    }
+                },
+                annotation: bedtimeIndex >= 0 ? {
+                    annotations: {
+                        bedtimeLine: {
+                            type: 'line',
+                            xMin: bedtimeIndex,
+                            xMax: bedtimeIndex,
+                            borderColor: '#9C27B0',
+                            borderWidth: 2,
+                            borderDash: [3, 3],
+                            label: {
+                                display: true,
+                                content: '취침',
+                                position: 'start',
+                            }
+                        }
+                    }
+                } : {}
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.05)',
+                    },
+                    ticks: {
+                        callback: function(value) {
+                            return value + 'mg';
+                        }
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false,
+                    },
+                    ticks: {
+                        maxRotation: 0,
+                        autoSkip: true,
+                        maxTicksLimit: 8,
+                    }
+                }
+            }
+        }
+    });
+}
+
+// ========================================
+// 기존 기능들
+// ========================================
+
 async function loadCategories() {
     try {
         categories = await BeverageAPI.getCategories();
@@ -123,7 +437,6 @@ async function loadCategories() {
     }
 }
 
-// 카테고리 셀렉트 박스 채우기
 function populateCategorySelect() {
     const select = document.getElementById('customCategory');
     select.innerHTML = '<option value="">선택하세요</option>';
@@ -131,12 +444,11 @@ function populateCategorySelect() {
     categories.forEach(category => {
         const option = document.createElement('option');
         option.value = category.code;
-        option.textContent = `${category.displayName} (기본: ${category.defaultServingSizeMl}ml, ${(category.caffeineMgPer100ml * category.defaultServingSizeMl / 100).toFixed(1)}mg)`;
+        option.textContent = `${category.displayName} (기본: ${category.defaultServingSizeMl}ml, ${Math.round(category.caffeineMgPer100ml * category.defaultServingSizeMl / 100)}mg)`;
         select.appendChild(option);
     });
 }
 
-// 음료 그룹핑 (같은 브랜드+이름끼리)
 function groupBeverages(beverageList) {
     const groups = {};
 
@@ -156,7 +468,6 @@ function groupBeverages(beverageList) {
         });
     });
 
-    // 용량순 정렬
     Object.values(groups).forEach(group => {
         group.sizes.sort((a, b) => a.volumeMl - b.volumeMl);
     });
@@ -164,7 +475,6 @@ function groupBeverages(beverageList) {
     return Object.values(groups);
 }
 
-// 음료 목록 렌더링 (그룹핑 적용)
 function renderBeverages(beverageList) {
     const grid = document.getElementById('beverageGrid');
 
@@ -207,25 +517,18 @@ function renderBeverages(beverageList) {
     }).join('');
 }
 
-// 사이즈 선택
 function selectSize(btn, brandName, name) {
     const card = btn.closest('.beverage-card-grouped');
-
-    // 활성화 상태 변경
     card.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
-
-    // 선택된 ID 업데이트
     card.dataset.selectedId = btn.dataset.id;
 }
 
-// 그룹화된 음료 클릭
 async function onGroupedBeverageClick(card) {
     const beverageId = parseInt(card.dataset.selectedId);
     await onBeverageClick(beverageId, 'preset');
 }
 
-// 음료 클릭 시 체크 후 모달 표시
 async function onBeverageClick(beverageId, type) {
     try {
         const checkResult = type === 'preset'
@@ -239,7 +542,6 @@ async function onBeverageClick(beverageId, type) {
     }
 }
 
-// 음료 체크 결과 모달 표시 (현대적 UI)
 function showDrinkCheckModal(beverageId, type, result) {
     selectedBeverage = { id: beverageId, type };
 
@@ -300,7 +602,6 @@ function showDrinkCheckModal(beverageId, type, result) {
         </div>
     `;
 
-    // 현재 시간으로 기본값 설정
     const now = new Date();
     const localDateTime = new Date(now.getTime() - now.getTimezoneOffset() * 60000)
         .toISOString()
@@ -310,7 +611,6 @@ function showDrinkCheckModal(beverageId, type, result) {
     modal.classList.add('active');
 }
 
-// 검색 리스너 설정
 function setupSearchListener() {
     const searchInput = document.getElementById('beverageSearch');
     const searchBtn = document.getElementById('searchBtn');
@@ -324,7 +624,6 @@ function setupSearchListener() {
     });
 }
 
-// 검색 수행
 async function performSearch() {
     const keyword = document.getElementById('beverageSearch').value.trim();
 
@@ -342,7 +641,6 @@ async function performSearch() {
     }
 }
 
-// 오늘 섭취 기록 로드
 async function loadTodayIntakes() {
     try {
         todayIntakes = await IntakeAPI.getTodayIntakes();
@@ -353,12 +651,10 @@ async function loadTodayIntakes() {
     }
 }
 
-// 섭취 횟수 업데이트
 function updateIntakeCount() {
     document.getElementById('intakeCount').textContent = `${todayIntakes.length}회`;
 }
 
-// 탭 리스너 설정
 function setupTabListeners() {
     document.querySelectorAll('.beverage-tab-btn').forEach(btn => {
         btn.addEventListener('click', () => {
@@ -373,7 +669,6 @@ function setupTabListeners() {
     });
 }
 
-// CustomBeverage 리스너 설정
 function setupCustomBeverageListeners() {
     document.getElementById('addCustomBtn').addEventListener('click', () => {
         openCustomBeverageModal();
@@ -395,7 +690,6 @@ function setupCustomBeverageListeners() {
     document.getElementById('customVolume').addEventListener('input', updateCaffeineEstimate);
 }
 
-// 모달 리스너 설정
 function setupModalListeners() {
     document.querySelectorAll('.modal-close').forEach(btn => {
         btn.addEventListener('click', () => {
@@ -403,30 +697,25 @@ function setupModalListeners() {
         });
     });
 
-    document.getElementById('intakeModal').addEventListener('click', (e) => {
-        if (e.target.id === 'intakeModal') {
-            closeAllModals();
-        }
-    });
-
-    document.getElementById('customBeverageModal').addEventListener('click', (e) => {
-        if (e.target.id === 'customBeverageModal') {
-            closeAllModals();
-        }
+    document.querySelectorAll('.modal').forEach(modal => {
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                closeAllModals();
+            }
+        });
     });
 
     document.getElementById('confirmIntakeBtn').addEventListener('click', confirmIntake);
 }
 
-// 모든 모달 닫기
 function closeAllModals() {
-    document.getElementById('intakeModal').classList.remove('active');
-    document.getElementById('customBeverageModal').classList.remove('active');
+    document.querySelectorAll('.modal').forEach(modal => {
+        modal.classList.remove('active');
+    });
     selectedBeverage = null;
     editingCustomBeverage = null;
 }
 
-// 카페인량 자동 계산
 function updateCaffeineEstimate() {
     const categoryCode = document.getElementById('customCategory').value;
     const volume = parseInt(document.getElementById('customVolume').value);
@@ -440,7 +729,6 @@ function updateCaffeineEstimate() {
     }
 }
 
-// CustomBeverage 로드
 async function loadCustomBeverages() {
     try {
         customBeverages = await CustomBeverageAPI.getMyBeverages();
@@ -450,7 +738,6 @@ async function loadCustomBeverages() {
     }
 }
 
-// CustomBeverage 렌더링
 function renderCustomBeverages() {
     const grid = document.getElementById('customBeverageGrid');
 
@@ -503,7 +790,6 @@ function renderCustomBeverages() {
     `).join('');
 }
 
-// CustomBeverage 모달 열기
 function openCustomBeverageModal(beverage = null) {
     editingCustomBeverage = beverage;
 
@@ -526,7 +812,6 @@ function openCustomBeverageModal(beverage = null) {
     document.getElementById('customBeverageModal').classList.add('active');
 }
 
-// CustomBeverage 저장
 async function saveCustomBeverage() {
     const name = document.getElementById('customName').value.trim();
     const category = document.getElementById('customCategory').value;
@@ -562,7 +847,6 @@ async function saveCustomBeverage() {
     }
 }
 
-// CustomBeverage 수정
 async function editCustomBeverage(beverageId) {
     const beverage = customBeverages.find(b => b.id === beverageId);
     if (beverage) {
@@ -570,7 +854,6 @@ async function editCustomBeverage(beverageId) {
     }
 }
 
-// CustomBeverage 삭제
 async function deleteCustomBeverage(beverageId) {
     if (!confirm('이 음료를 삭제하시겠습니까?')) {
         return;
@@ -584,7 +867,6 @@ async function deleteCustomBeverage(beverageId) {
     }
 }
 
-// 오늘 섭취 기록 렌더링
 function renderTodayIntakes() {
     const timeline = document.getElementById('intakesTimeline');
 
@@ -623,7 +905,6 @@ function renderTodayIntakes() {
     }).join('');
 }
 
-// 기존 섭취 모달 열기 (폴백용)
 function openIntakeModal(beverageId, type) {
     selectedBeverage = { id: beverageId, type };
 
@@ -662,7 +943,6 @@ function openIntakeModal(beverageId, type) {
     document.getElementById('intakeModal').classList.add('active');
 }
 
-// 섭취 기록 확인
 async function confirmIntake() {
     if (!selectedBeverage) return;
 
@@ -686,13 +966,13 @@ async function confirmIntake() {
 
         await loadTodayIntakes();
         await loadCaffeineStatus();
+        await loadTimeline();
 
     } catch (error) {
         alert('섭취 기록 실패: ' + error.message);
     }
 }
 
-// 섭취 기록 삭제
 async function deleteIntake(intakeId) {
     if (!confirm('이 기록을 삭제하시겠습니까?')) {
         return;
@@ -702,6 +982,7 @@ async function deleteIntake(intakeId) {
         await IntakeAPI.delete(intakeId);
         await loadTodayIntakes();
         await loadCaffeineStatus();
+        await loadTimeline();
     } catch (error) {
         alert('삭제 실패: ' + error.message);
     }
