@@ -95,3 +95,19 @@ const CustomBeverageAPI = {
         method: 'DELETE',
     }),
 };
+
+// Caffeine Check API
+const CaffeineAPI = {
+    // 현재 카페인 상태 조회
+    getStatus: () => fetchAPI(`${API_BASE}/caffeine/status`),
+
+    // PresetBeverage 마셔도 되는지 체크
+    checkPreset: (beverageId) => fetchAPI(`${API_BASE}/caffeine/check/preset/${beverageId}`, {
+        method: 'POST',
+    }),
+
+    // CustomBeverage 마셔도 되는지 체크
+    checkCustom: (beverageId) => fetchAPI(`${API_BASE}/caffeine/check/custom/${beverageId}`, {
+        method: 'POST',
+    }),
+};
