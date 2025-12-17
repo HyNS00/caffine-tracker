@@ -131,7 +131,7 @@ function populateCategorySelect() {
     categories.forEach(category => {
         const option = document.createElement('option');
         option.value = category.code;
-        option.textContent = `${category.displayName} (기본: ${category.defaultServingSizeMl}ml, ${Math.round(category.caffeineMgPer100ml * category.defaultServingSizeMl / 100)}mg)`;
+        option.textContent = `${category.displayName} (기본: ${category.defaultServingSizeMl}ml, ${(category.caffeineMgPer100ml * category.defaultServingSizeMl / 100).toFixed(1)}mg)`;
         select.appendChild(option);
     });
 }
