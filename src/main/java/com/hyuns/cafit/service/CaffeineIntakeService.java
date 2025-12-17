@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Clock;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -24,6 +25,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class CaffeineIntakeService {
+    private final Clock clock;
     private final CaffeineIntakeRepository intakeRepository;
     private final PresetBeverageRepository presetBeverageRepository;
     private final CustomBeverageRepository customBeverageRepository;
@@ -64,8 +66,9 @@ public class CaffeineIntakeService {
 
     @Transactional(readOnly = true)
     public List<CaffeineIntakeResponse> getTodayIntakes(User user) {
-        LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
-        LocalDateTime endOfDay = LocalDate.now().atTime(LocalTime.MAX);
+        LocalDate today = LocalDate.now(clock);
+        LocalDateTime startOfDay = today.atStartOfDay();
+        LocalDateTime endOfDay = today.atTime(LocalTime.MAX);
 
         List<CaffeineIntake> intakes = intakeRepository.findByUserAndConsumedAtBetweenOrderByConsumedAtDesc(
                 user, startOfDay, endOfDay
@@ -81,7 +84,6 @@ public class CaffeineIntakeService {
         CaffeineIntake intake = intakeRepository.findById(intakeId)
                 .orElseThrow(() -> new EntityNotFoundException(ErrorMessage.INTAKE_NOT_FOUND));
 
-        // 권한 검증: 본인의 섭취 기록인지 확인
         if (!intake.isOwnedBy(user)) {
             throw new ForbiddenException(ErrorMessage.UNAUTHORIZED_INTAKE_ACCESS);
         }
