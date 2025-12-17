@@ -15,14 +15,15 @@ public enum DrinkRecommendation {
     private final String description;
 
     public static DrinkRecommendation determine(
-            User user,
+            double todayTotalMg,
+            double dailyLimitMg,
             double predictedAtBedtimeMg,
-            double todayTotalMg
+            double targetSleepCaffeineMg
     ) {
-        if (todayTotalMg > user.getDailyCaffeineLimit()) {
+        if (todayTotalMg > dailyLimitMg) {
             return DANGER;
         }
-        if (predictedAtBedtimeMg > user.getTargetSleepCaffeine()) {
+        if (predictedAtBedtimeMg > targetSleepCaffeineMg) {
             return WARNING;
         }
         return SAFE;
