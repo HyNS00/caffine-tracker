@@ -31,9 +31,9 @@ INSERT INTO preset_beverages (name, brand_name, category, volume_ml, caffeine_mg
 -- ========================================
 INSERT INTO preset_beverages (name, brand_name, category, volume_ml, caffeine_mg) VALUES
                                                                                       ('아메리카노', '이디야', 'AMERICANO', 532, 158.0),
-                                                                                      ('아이스 아메리카노', '이디야', 'AMERICANO', 532, 158.0),
+                                                                                      ('아메리카노', '이디야', 'AMERICANO', 651, 237.0),
                                                                                       ('카페라떼', '이디야', 'LATTE', 532, 158.0),
-                                                                                      ('아이스 카페라떼', '이디야', 'LATTE', 532, 158.0),
+                                                                                      ('카페라떼', '이디야', 'LATTE', 651, 237.0),
                                                                                       ('카푸치노', '이디야', 'CAPPUCCINO', 532, 158.0),
                                                                                       ('카페모카', '이디야', 'MOCHA', 532, 158.0),
                                                                                       ('에스프레소', '이디야', 'ESPRESSO', 30, 79.0),
@@ -45,8 +45,8 @@ INSERT INTO preset_beverages (name, brand_name, category, volume_ml, caffeine_mg
 -- 메가커피 (10개)
 -- ========================================
 INSERT INTO preset_beverages (name, brand_name, category, volume_ml, caffeine_mg) VALUES
-                                                                                      ('메가리카노', '메가커피', 'AMERICANO', 591, 204.0),
-                                                                                      ('아이스 메가리카노', '메가커피', 'AMERICANO', 710, 200.0),
+                                                                                      ('아메리카노', '메가커피', 'AMERICANO', 591, 200.0),
+                                                                                      ('아메리카노', '메가커피', 'AMERICANO', 946, 290.0),
                                                                                       ('카페라떼', '메가커피', 'LATTE', 591, 190.0),
                                                                                       ('아이스 카페라떼', '메가커피', 'LATTE', 591, 199.0),
                                                                                       ('바닐라 라떼', '메가커피', 'LATTE', 591, 190.0),
@@ -61,7 +61,7 @@ INSERT INTO preset_beverages (name, brand_name, category, volume_ml, caffeine_mg
 -- ========================================
 INSERT INTO preset_beverages (name, brand_name, category, volume_ml, caffeine_mg) VALUES
                                                                                       ('아메리카노', '투썸플레이스', 'AMERICANO', 355, 184.0),
-                                                                                      ('아이스 아메리카노', '투썸플레이스', 'AMERICANO', 355, 184.0),
+                                                                                      ('아메리카노', '투썸플레이스', 'AMERICANO', 473, 245.0),
                                                                                       ('카페라떼', '투썸플레이스', 'LATTE', 355, 184.0),
                                                                                       ('카푸치노', '투썸플레이스', 'CAPPUCCINO', 355, 184.0),
                                                                                       ('카페모카', '투썸플레이스', 'MOCHA', 355, 184.0),
@@ -187,3 +187,7 @@ INSERT INTO preset_beverages (name, brand_name, category, volume_ml, caffeine_mg
 -- 편의점 캔커피: 10개
 -- ========================================
 -- 총: 106개
+
+-- 테스트용 데이터
+INSERT INTO users (email, password, name, daily_caffeine_limit, caffeine_half_life, bed_time, target_sleep_caffeine)
+VALUES ('test@test.com', 'test1234', '테스트', 400, 5.0, '23:00:00', 50.0);
