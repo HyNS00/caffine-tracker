@@ -1,5 +1,6 @@
 package com.hyuns.cafit.dto.caffeine;
 
+import com.hyuns.cafit.domain.user.User;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -12,4 +13,18 @@ public enum DrinkRecommendation {
 
     private final String label;
     private final String description;
+
+    public static DrinkRecommendation determine(
+            User user,
+            double predictedAtBedtimeMg,
+            double todayTotalMg
+    ) {
+        if (todayTotalMg > user.getDailyCaffeineLimit()) {
+            return DANGER;
+        }
+        if (predictedAtBedtimeMg > user.getTargetSleepCaffeine()) {
+            return WARNING;
+        }
+        return SAFE;
+    }
 }
