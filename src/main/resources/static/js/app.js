@@ -5,11 +5,13 @@ let categories = [];
 let todayIntakes = [];
 let selectedBeverage = null;
 let editingCustomBeverage = null;
+let currentCaffeineStatus = null;
 
 // 앱 초기화
 async function initApp() {
     updateTodayDate();
     await loadCategories();
+    await loadCaffeineStatus();
     await loadCustomBeverages();
     await loadTodayIntakes();
     setupTabListeners();
@@ -23,6 +25,92 @@ function updateTodayDate() {
     const today = new Date();
     const options = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' };
     document.getElementById('todayDate').textContent = today.toLocaleDateString('ko-KR', options);
+}
+
+// 카페인 상태 로드
+async function loadCaffeineStatus() {
+    try {
+        currentCaffeineStatus = await CaffeineAPI.getStatus();
+        updateCaffeineStatusUI();
+    } catch (error) {
+        console.error('카페인 상태 로드 실패:', error);
+    }
+}
+
+// 카페인 상태 UI 업데이트
+function updateCaffeineStatusUI() {
+    if (!currentCaffeineStatus) return;
+
+    const { status, settings, recommendation } = currentCaffeineStatus;
+
+    // 현재 체내 카페인 표시
+    document.getElementById('totalCaffeine').textContent = Math.round(status.currentMg);
+
+    // 프로그레스 링 업데이트
+    updateProgressRing(status.todayTotalMg, settings.dailyLimitMg);
+
+    // 취침 시 예상 표시
+    updateBedtimePrediction(status.predictedAtBedtimeMg, settings.targetSleepCaffeineMg, status.hoursUntilBedtime);
+
+    // 상태 배지 업데이트
+    updateRecommendationBadge(recommendation);
+}
+
+// 프로그레스 링 업데이트
+function updateProgressRing(currentMg, limitMg) {
+    const percentage = Math.min((currentMg / limitMg) * 100, 100);
+    const circumference = 534.07;
+    const offset = circumference - (circumference * percentage / 100);
+
+    const progressRing = document.getElementById('caffeineProgress');
+    progressRing.style.strokeDashoffset = offset;
+
+    // 색상 변경
+    if (percentage > 100) {
+        progressRing.style.stroke = '#E57373';
+    } else if (percentage > 80) {
+        progressRing.style.stroke = '#FF9800';
+    } else if (percentage > 50) {
+        progressRing.style.stroke = '#FFC857';
+    } else {
+        progressRing.style.stroke = '#4CAF50';
+    }
+}
+
+// 취침 시 예상 카페인 표시
+function updateBedtimePrediction(predictedMg, targetMg, hoursUntilBedtime) {
+    const element = document.getElementById('bedtimePrediction');
+    if (element) {
+        const isOver = predictedMg > targetMg;
+        const hours = Math.floor(hoursUntilBedtime);
+        const minutes = Math.round((hoursUntilBedtime - hours) * 60);
+
+        element.innerHTML = `
+            <div class="bedtime-card ${isOver ? 'warning' : 'safe'}">
+                <div class="bedtime-icon">${isOver ? '🌙' : '😴'}</div>
+                <div class="bedtime-info">
+                    <span class="bedtime-label">취침까지 ${hours}시간 ${minutes}분</span>
+                    <span class="bedtime-value">${Math.round(predictedMg)}mg <span class="bedtime-target">/ ${targetMg}mg</span></span>
+                </div>
+            </div>
+        `;
+    }
+}
+
+// 상태 배지 업데이트
+function updateRecommendationBadge(recommendation) {
+    const badge = document.getElementById('recommendationBadge');
+    if (!badge) return;
+
+    const config = {
+        'SAFE': { class: 'badge-safe', text: '안전', icon: '✓' },
+        'WARNING': { class: 'badge-warning', text: '주의', icon: '!' },
+        'DANGER': { class: 'badge-danger', text: '위험', icon: '✕' }
+    };
+
+    const { class: badgeClass, text, icon } = config[recommendation] || config['SAFE'];
+    badge.className = `recommendation-badge ${badgeClass}`;
+    badge.innerHTML = `<span class="badge-icon">${icon}</span><span class="badge-text">${text}</span>`;
 }
 
 // 카테고리 로드
@@ -48,31 +136,178 @@ function populateCategorySelect() {
     });
 }
 
-// 음료 목록 렌더링
+// 음료 그룹핑 (같은 브랜드+이름끼리)
+function groupBeverages(beverageList) {
+    const groups = {};
+
+    beverageList.forEach(beverage => {
+        const key = `${beverage.brandName}-${beverage.name}`;
+        if (!groups[key]) {
+            groups[key] = {
+                brandName: beverage.brandName,
+                name: beverage.name,
+                sizes: []
+            };
+        }
+        groups[key].sizes.push({
+            id: beverage.id,
+            volumeMl: beverage.volumeMl,
+            caffeineMg: beverage.caffeineMg
+        });
+    });
+
+    // 용량순 정렬
+    Object.values(groups).forEach(group => {
+        group.sizes.sort((a, b) => a.volumeMl - b.volumeMl);
+    });
+
+    return Object.values(groups);
+}
+
+// 음료 목록 렌더링 (그룹핑 적용)
 function renderBeverages(beverageList) {
     const grid = document.getElementById('beverageGrid');
 
     if (beverageList.length === 0) {
-        grid.innerHTML = '<div class="empty-state">검색 결과가 없습니다</div>';
+        grid.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🔍</div><p>검색 결과가 없습니다</p></div>';
         return;
     }
 
-    grid.innerHTML = beverageList.map(beverage => `
-        <div class="beverage-card" onclick="openIntakeModal(${beverage.id}, 'preset')">
-            <div class="beverage-brand">${beverage.brandName}</div>
-            <div class="beverage-name">${beverage.name}</div>
-            <div class="beverage-info">
-                <div class="beverage-detail">
-                    <div class="beverage-detail-label">용량</div>
-                    <div class="beverage-detail-value">${beverage.volumeMl}ml</div>
+    const groups = groupBeverages(beverageList);
+
+    grid.innerHTML = groups.map(group => {
+        const sizesHtml = group.sizes.map((size, index) => `
+            <button class="size-btn ${index === 0 ? 'active' : ''}" 
+                    data-id="${size.id}" 
+                    data-volume="${size.volumeMl}" 
+                    data-caffeine="${size.caffeineMg}"
+                    onclick="selectSize(this, '${group.brandName}', '${group.name}')">
+                <span class="size-volume">${size.volumeMl}ml</span>
+                <span class="size-caffeine">${Math.round(size.caffeineMg)}mg</span>
+            </button>
+        `).join('');
+
+        const firstSize = group.sizes[0];
+
+        return `
+            <div class="beverage-card-grouped" data-selected-id="${firstSize.id}">
+                <div class="beverage-header">
+                    <span class="beverage-brand">${group.brandName}</span>
+                    <span class="beverage-name">${group.name}</span>
                 </div>
-                <div class="beverage-detail">
-                    <div class="beverage-detail-label">카페인</div>
-                    <div class="beverage-detail-value">${Math.round(beverage.caffeineMg)}mg</div>
+                <div class="size-selector">
+                    ${sizesHtml}
+                </div>
+                <button class="btn-drink" onclick="onGroupedBeverageClick(this.closest('.beverage-card-grouped'))">
+                    <span class="btn-drink-icon">☕</span>
+                    <span>마시기</span>
+                </button>
+            </div>
+        `;
+    }).join('');
+}
+
+// 사이즈 선택
+function selectSize(btn, brandName, name) {
+    const card = btn.closest('.beverage-card-grouped');
+
+    // 활성화 상태 변경
+    card.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+
+    // 선택된 ID 업데이트
+    card.dataset.selectedId = btn.dataset.id;
+}
+
+// 그룹화된 음료 클릭
+async function onGroupedBeverageClick(card) {
+    const beverageId = parseInt(card.dataset.selectedId);
+    await onBeverageClick(beverageId, 'preset');
+}
+
+// 음료 클릭 시 체크 후 모달 표시
+async function onBeverageClick(beverageId, type) {
+    try {
+        const checkResult = type === 'preset'
+            ? await CaffeineAPI.checkPreset(beverageId)
+            : await CaffeineAPI.checkCustom(beverageId);
+
+        showDrinkCheckModal(beverageId, type, checkResult);
+    } catch (error) {
+        console.error('음료 체크 실패:', error);
+        openIntakeModal(beverageId, type);
+    }
+}
+
+// 음료 체크 결과 모달 표시 (현대적 UI)
+function showDrinkCheckModal(beverageId, type, result) {
+    selectedBeverage = { id: beverageId, type };
+
+    const modal = document.getElementById('intakeModal');
+    const beverageInfo = document.getElementById('selectedBeverageInfo');
+
+    const recommendationConfig = {
+        'SAFE': { class: 'result-safe', icon: '✓', message: '안전하게 마실 수 있어요' },
+        'WARNING': { class: 'result-warning', icon: '!', message: '수면에 영향을 줄 수 있어요' },
+        'DANGER': { class: 'result-danger', icon: '✕', message: '오늘은 그만 마시는 게 좋아요' }
+    };
+
+    const config = recommendationConfig[result.recommendation];
+
+    beverageInfo.innerHTML = `
+        <div class="drink-check-result">
+            <div class="drink-header">
+                <h4 class="drink-name">${result.beverage.name}</h4>
+                <span class="drink-caffeine">${result.beverage.caffeineMg}mg</span>
+            </div>
+            
+            <div class="caffeine-comparison">
+                <div class="comparison-item before">
+                    <div class="comparison-label">현재</div>
+                    <div class="comparison-main">
+                        <span class="comparison-value">${result.before.currentMg}</span>
+                        <span class="comparison-unit">mg</span>
+                    </div>
+                    <div class="comparison-bedtime">
+                        <span class="bedtime-icon-small">🌙</span>
+                        <span>${result.before.predictedAtBedtimeMg}mg</span>
+                    </div>
+                </div>
+                
+                <div class="comparison-arrow">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                        <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                
+                <div class="comparison-item after ${result.recommendation.toLowerCase()}">
+                    <div class="comparison-label">마신 후</div>
+                    <div class="comparison-main">
+                        <span class="comparison-value">${result.after.currentMg}</span>
+                        <span class="comparison-unit">mg</span>
+                    </div>
+                    <div class="comparison-bedtime">
+                        <span class="bedtime-icon-small">🌙</span>
+                        <span>${result.after.predictedAtBedtimeMg}mg</span>
+                    </div>
                 </div>
             </div>
+            
+            <div class="result-message ${config.class}">
+                <span class="result-icon">${config.icon}</span>
+                <span class="result-text">${config.message}</span>
+            </div>
         </div>
-    `).join('');
+    `;
+
+    // 현재 시간으로 기본값 설정
+    const now = new Date();
+    const localDateTime = new Date(now.getTime() - now.getTimezoneOffset() * 60000)
+        .toISOString()
+        .slice(0, 16);
+    document.getElementById('consumedAtInput').value = localDateTime;
+
+    modal.classList.add('active');
 }
 
 // 검색 리스너 설정
@@ -80,10 +315,8 @@ function setupSearchListener() {
     const searchInput = document.getElementById('beverageSearch');
     const searchBtn = document.getElementById('searchBtn');
 
-    // 검색 버튼 클릭
     searchBtn.addEventListener('click', performSearch);
 
-    // Enter 키 입력
     searchInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') {
             performSearch();
@@ -114,10 +347,15 @@ async function loadTodayIntakes() {
     try {
         todayIntakes = await IntakeAPI.getTodayIntakes();
         renderTodayIntakes();
-        updateSummaryStats();
+        updateIntakeCount();
     } catch (error) {
         console.error('섭취 기록 로드 실패:', error);
     }
+}
+
+// 섭취 횟수 업데이트
+function updateIntakeCount() {
+    document.getElementById('intakeCount').textContent = `${todayIntakes.length}회`;
 }
 
 // 탭 리스너 설정
@@ -126,11 +364,9 @@ function setupTabListeners() {
         btn.addEventListener('click', () => {
             const tab = btn.dataset.tab;
 
-            // 탭 버튼 활성화
             document.querySelectorAll('.beverage-tab-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
 
-            // 탭 컨텐츠 전환
             document.querySelectorAll('.beverage-tab-content').forEach(content => content.classList.remove('active'));
             document.getElementById(`${tab}Tab`).classList.add('active');
         });
@@ -139,15 +375,12 @@ function setupTabListeners() {
 
 // CustomBeverage 리스너 설정
 function setupCustomBeverageListeners() {
-    // 추가 버튼
     document.getElementById('addCustomBtn').addEventListener('click', () => {
         openCustomBeverageModal();
     });
 
-    // 저장 버튼
     document.getElementById('saveCustomBtn').addEventListener('click', saveCustomBeverage);
 
-    // 카테고리 선택 시 기본값 설정
     document.getElementById('customCategory').addEventListener('change', (e) => {
         const selectedCode = e.target.value;
         if (!selectedCode) return;
@@ -155,39 +388,33 @@ function setupCustomBeverageListeners() {
         const category = categories.find(c => c.code === selectedCode);
         if (category) {
             document.getElementById('customVolume').value = category.defaultServingSizeMl;
-            // 카페인도 자동 계산
             updateCaffeineEstimate();
         }
     });
 
-    // 용량 변경 시 카페인 자동 계산
     document.getElementById('customVolume').addEventListener('input', updateCaffeineEstimate);
 }
 
 // 모달 리스너 설정
 function setupModalListeners() {
-    // 모든 모달 닫기 버튼
     document.querySelectorAll('.modal-close').forEach(btn => {
         btn.addEventListener('click', () => {
             closeAllModals();
         });
     });
 
-    // intakeModal 배경 클릭 시 닫기
     document.getElementById('intakeModal').addEventListener('click', (e) => {
         if (e.target.id === 'intakeModal') {
             closeAllModals();
         }
     });
 
-    // customBeverageModal 배경 클릭 시 닫기
     document.getElementById('customBeverageModal').addEventListener('click', (e) => {
         if (e.target.id === 'customBeverageModal') {
             closeAllModals();
         }
     });
 
-    // 섭취 기록 확인 버튼
     document.getElementById('confirmIntakeBtn').addEventListener('click', confirmIntake);
 }
 
@@ -238,25 +465,40 @@ function renderCustomBeverages() {
     }
 
     grid.innerHTML = customBeverages.map(beverage => `
-        <div class="beverage-card custom-beverage">
+        <div class="beverage-card-grouped custom-card">
             <div class="beverage-card-actions">
-                <button class="btn-icon" onclick="editCustomBeverage(${beverage.id})" title="수정">✏️</button>
-                <button class="btn-icon delete" onclick="deleteCustomBeverage(${beverage.id})" title="삭제">🗑️</button>
+                <button class="btn-icon-modern" onclick="event.stopPropagation(); editCustomBeverage(${beverage.id})" title="수정">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                    </svg>
+                </button>
+                <button class="btn-icon-modern delete" onclick="event.stopPropagation(); deleteCustomBeverage(${beverage.id})" title="삭제">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="3,6 5,6 21,6"/>
+                        <path d="M19,6v14a2,2,0,0,1-2,2H7a2,2,0,0,1-2-2V6m3,0V4a2,2,0,0,1,2-2h4a2,2,0,0,1,2,2v2"/>
+                    </svg>
+                </button>
             </div>
-            <div onclick="openIntakeModal(${beverage.id}, 'custom')">
-                <div class="beverage-brand">내 음료</div>
-                <div class="beverage-name">${beverage.name}</div>
-                <div class="beverage-info">
-                    <div class="beverage-detail">
-                        <div class="beverage-detail-label">용량</div>
-                        <div class="beverage-detail-value">${beverage.volumeMl}ml</div>
-                    </div>
-                    <div class="beverage-detail">
-                        <div class="beverage-detail-label">카페인</div>
-                        <div class="beverage-detail-value">${Math.round(beverage.caffeineMg)}mg</div>
-                    </div>
+            <div class="beverage-header">
+                <span class="beverage-brand custom-badge">내 음료</span>
+                <span class="beverage-name">${beverage.name}</span>
+            </div>
+            <div class="custom-info">
+                <div class="info-item">
+                    <span class="info-value">${beverage.volumeMl}</span>
+                    <span class="info-label">ml</span>
+                </div>
+                <div class="info-divider"></div>
+                <div class="info-item">
+                    <span class="info-value">${Math.round(beverage.caffeineMg)}</span>
+                    <span class="info-label">mg</span>
                 </div>
             </div>
+            <button class="btn-drink" onclick="onBeverageClick(${beverage.id}, 'custom')">
+                <span class="btn-drink-icon">☕</span>
+                <span>마시기</span>
+            </button>
         </div>
     `).join('');
 }
@@ -266,11 +508,9 @@ function openCustomBeverageModal(beverage = null) {
     editingCustomBeverage = beverage;
 
     if (beverage) {
-        // 수정 모드
         document.getElementById('customModalTitle').textContent = '음료 수정';
         document.getElementById('customName').value = beverage.name;
 
-        // 카테고리는 displayName으로 저장되어 있으므로 code를 찾아야 함
         const category = categories.find(c => c.displayName === beverage.category);
         if (category) {
             document.getElementById('customCategory').value = category.code;
@@ -279,7 +519,6 @@ function openCustomBeverageModal(beverage = null) {
         document.getElementById('customVolume').value = beverage.volumeMl;
         document.getElementById('customCaffeine').value = beverage.caffeineMg;
     } else {
-        // 추가 모드
         document.getElementById('customModalTitle').textContent = '나만의 음료 추가';
         document.getElementById('customBeverageForm').reset();
     }
@@ -301,14 +540,12 @@ async function saveCustomBeverage() {
 
     try {
         if (editingCustomBeverage) {
-            // 수정
             await CustomBeverageAPI.update(editingCustomBeverage.id, {
                 name,
                 volumeMl,
                 caffeineMg
             });
         } else {
-            // 추가
             await CustomBeverageAPI.create({
                 name,
                 category,
@@ -317,10 +554,7 @@ async function saveCustomBeverage() {
             });
         }
 
-        // 모달 닫기
         closeAllModals();
-
-        // 목록 새로고침
         await loadCustomBeverages();
 
     } catch (error) {
@@ -371,54 +605,28 @@ function renderTodayIntakes() {
         });
 
         return `
-            <div class="intake-item">
-                <div class="intake-info">
-                    <div class="intake-time">${time}</div>
+            <div class="intake-item-modern">
+                <div class="intake-time-badge">${time}</div>
+                <div class="intake-content">
                     <div class="intake-name">${intake.displayName}</div>
-                    <div class="intake-details">${intake.category} · ${intake.volumeMl}ml</div>
+                    <div class="intake-meta">${intake.category} · ${intake.volumeMl}ml</div>
                 </div>
-                <div class="intake-caffeine">${Math.round(intake.caffeineMg)}mg</div>
-                <button class="btn-delete" onclick="deleteIntake(${intake.id})">삭제</button>
+                <div class="intake-caffeine-badge">${Math.round(intake.caffeineMg)}mg</div>
+                <button class="btn-delete-modern" onclick="deleteIntake(${intake.id})">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="3,6 5,6 21,6"/>
+                        <path d="M19,6v14a2,2,0,0,1-2,2H7a2,2,0,0,1-2-2V6m3,0V4a2,2,0,0,1,2-2h4a2,2,0,0,1,2,2v2"/>
+                    </svg>
+                </button>
             </div>
         `;
     }).join('');
 }
 
-// 요약 통계 업데이트
-function updateSummaryStats() {
-    const totalCaffeine = todayIntakes.reduce((sum, intake) => sum + intake.caffeineMg, 0);
-    const intakeCount = todayIntakes.length;
-
-    // 카페인 총량 표시
-    document.getElementById('totalCaffeine').textContent = Math.round(totalCaffeine);
-    document.getElementById('intakeCount').textContent = `${intakeCount}회`;
-
-    // 프로그레스 링 업데이트 (400mg 기준)
-    const maxCaffeine = 400;
-    const percentage = Math.min((totalCaffeine / maxCaffeine) * 100, 100);
-    const circumference = 534.07; // 2 * PI * 85
-    const offset = circumference - (circumference * percentage / 100);
-
-    const progressRing = document.getElementById('caffeineProgress');
-    progressRing.style.strokeDashoffset = offset;
-
-    // 색상 변경 (과다 섭취 시 경고색)
-    if (percentage > 100) {
-        progressRing.style.stroke = '#E57373';  // 빨간색
-    } else if (percentage > 80) {
-        progressRing.style.stroke = '#FF9800';  // 주황색
-    } else if (percentage > 50) {
-        progressRing.style.stroke = '#FFC857';  // 노란색
-    } else {
-        progressRing.style.stroke = '#4CAF50';  // 녹색
-    }
-}
-
-// 섭취 모달 열기
+// 기존 섭취 모달 열기 (폴백용)
 function openIntakeModal(beverageId, type) {
     selectedBeverage = { id: beverageId, type };
 
-    // 선택한 음료 정보 찾기
     let beverage;
     if (type === 'preset') {
         beverage = beverages.find(b => b.id === beverageId);
@@ -428,7 +636,6 @@ function openIntakeModal(beverageId, type) {
 
     if (!beverage) return;
 
-    // 모달에 음료 정보 표시
     const brandHTML = beverage.brandName ? `<div class="beverage-brand">${beverage.brandName}</div>` : '';
 
     document.getElementById('selectedBeverageInfo').innerHTML = `
@@ -446,14 +653,12 @@ function openIntakeModal(beverageId, type) {
         </div>
     `;
 
-    // 현재 시간으로 기본값 설정
     const now = new Date();
     const localDateTime = new Date(now.getTime() - now.getTimezoneOffset() * 60000)
         .toISOString()
         .slice(0, 16);
     document.getElementById('consumedAtInput').value = localDateTime;
 
-    // 모달 표시
     document.getElementById('intakeModal').classList.add('active');
 }
 
@@ -469,7 +674,6 @@ async function confirmIntake() {
     }
 
     try {
-        // 로컬 시간 그대로 전송 (시간대 문제 해결)
         const isoDateTime = consumedAt + ':00';
 
         if (selectedBeverage.type === 'preset') {
@@ -478,11 +682,10 @@ async function confirmIntake() {
             await IntakeAPI.recordCustom(selectedBeverage.id, isoDateTime);
         }
 
-        // 모달 닫기
         closeAllModals();
 
-        // 섭취 기록 새로고침
         await loadTodayIntakes();
+        await loadCaffeineStatus();
 
     } catch (error) {
         alert('섭취 기록 실패: ' + error.message);
@@ -498,6 +701,7 @@ async function deleteIntake(intakeId) {
     try {
         await IntakeAPI.delete(intakeId);
         await loadTodayIntakes();
+        await loadCaffeineStatus();
     } catch (error) {
         alert('삭제 실패: ' + error.message);
     }
