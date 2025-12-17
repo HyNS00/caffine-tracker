@@ -105,11 +105,15 @@ function showAppScreen() {
 }
 
 // 페이지 로드 시 세션 체크
-window.addEventListener('DOMContentLoaded', () => {
-    const user = sessionStorage.getItem('user');
-    if (user) {
+window.addEventListener('DOMContentLoaded', async () => {
+    try {
+        // 서버에 세션 유효성 확인
+        const user = await AuthAPI.me();
+        sessionStorage.setItem('user', JSON.stringify(user));
         showAppScreen();
-    } else {
+    } catch (error) {
+        // 세션 없음 → 로그인 화면
+        sessionStorage.removeItem('user');
         showLoginScreen();
     }
 });
