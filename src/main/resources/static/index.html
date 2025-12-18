@@ -97,56 +97,105 @@
 
     <!-- Main Content -->
     <main class="app-main">
-        <!-- Today's Summary Card -->
-        <section class="summary-card">
+        <!-- Today's Summary: 커피컵 게이지 + 섭취 기록 (옆으로 배치) -->
+        <section class="summary-section">
             <div class="summary-header">
                 <h2>오늘의 카페인</h2>
                 <div class="summary-date" id="todayDate"></div>
             </div>
-            <div class="summary-stats">
-                <div class="stat-circle">
-                    <svg viewBox="0 0 200 200" class="progress-ring">
-                        <circle cx="100" cy="100" r="85" class="progress-ring-bg"></circle>
-                        <circle cx="100" cy="100" r="85" class="progress-ring-fill" id="caffeineProgress"></circle>
-                    </svg>
-                    <div class="stat-content">
-                        <div class="stat-value" id="totalCaffeine">0</div>
-                        <div class="stat-unit">mg</div>
+
+            <div class="summary-content">
+                <!-- 왼쪽: 커피컵 게이지 -->
+                <div class="coffee-gauge-card">
+                    <div class="coffee-cup-wrapper">
+                        <div class="coffee-cup">
+                            <div class="cup-body">
+                                <div class="coffee-fill" id="coffeeFill"></div>
+                                <div class="coffee-bubbles">
+                                    <span></span><span></span><span></span>
+                                </div>
+                            </div>
+                            <div class="cup-handle"></div>
+                        </div>
+                        <div class="coffee-stats">
+                            <div class="coffee-current">
+                                <span class="coffee-value" id="coffeeValue">0</span>
+                                <span class="coffee-unit">mg</span>
+                            </div>
+                            <div class="coffee-percent" id="coffeePercent">0%</div>
+                            <div class="coffee-limit">일일 권장량: <span id="dailyLimit">400mg</span></div>
+                        </div>
                     </div>
+                    <div id="bedtimePrediction"></div>
                 </div>
-                <div class="stat-info">
-                    <div class="stat-item">
-                        <span class="stat-label">일일 권장량</span>
-                        <span class="stat-data" id="dailyLimit">400mg</span>
+
+                <!-- 오른쪽: 오늘 마신 기록 -->
+                <div class="today-intakes-card">
+                    <div class="intakes-header">
+                        <h3>오늘 마신 기록</h3>
+                        <span class="intake-count" id="intakeCount">0회</span>
                     </div>
-                    <div class="stat-item">
-                        <span class="stat-label">섭취 횟수</span>
-                        <span class="stat-data" id="intakeCount">0회</span>
+                    <div class="intakes-timeline" id="intakesTimeline">
+                        <!-- 섭취 기록 표시 -->
                     </div>
                 </div>
             </div>
-            <div id="bedtimePrediction"></div>
         </section>
 
-        <!-- Timeline Chart Section -->
+        <!-- Chart Section: 탭으로 꺾은선/히트맵 전환 -->
         <section class="chart-section">
             <div class="chart-card">
                 <div class="chart-header">
                     <h3>체내 카페인 추이</h3>
-                    <span class="chart-subtitle">향후 12시간 예측</span>
+                    <div class="chart-tabs">
+                        <button class="chart-tab-btn active" id="lineChartTab">📈 그래프</button>
+                        <button class="chart-tab-btn" id="heatmapTab">🟩 히트맵</button>
+                    </div>
                 </div>
-                <div class="chart-wrapper">
-                    <canvas id="caffeineChart"></canvas>
+
+                <!-- 꺾은선 그래프 -->
+                <div class="chart-container active" id="lineChartContainer">
+                    <div class="chart-wrapper">
+                        <canvas id="caffeineChart"></canvas>
+                    </div>
+                    <div class="chart-legend">
+                        <span class="legend-item">
+                            <span class="legend-dot caffeine"></span>
+                            체내 카페인
+                        </span>
+                        <span class="legend-item">
+                            <span class="legend-dot target"></span>
+                            목표 수면 카페인
+                        </span>
+                    </div>
                 </div>
-                <div class="chart-legend">
-                    <span class="legend-item">
-                        <span class="legend-dot caffeine"></span>
-                        체내 카페인
-                    </span>
-                    <span class="legend-item">
-                        <span class="legend-dot target"></span>
-                        목표 수면 카페인
-                    </span>
+
+                <!-- 히트맵 -->
+                <div class="chart-container" id="heatmapContainer">
+                    <div class="heatmap-wrapper">
+                        <div class="heatmap-title">향후 12시간 카페인 변화</div>
+                        <div class="heatmap-grid" id="heatmapGrid">
+                            <!-- JS로 생성 -->
+                        </div>
+                        <div class="heatmap-legend">
+                            <div class="heatmap-legend-item">
+                                <div class="heatmap-legend-color" style="background: #C62828;"></div>
+                                <span>높음</span>
+                            </div>
+                            <div class="heatmap-legend-item">
+                                <div class="heatmap-legend-color" style="background: #FF9800;"></div>
+                                <span>주의</span>
+                            </div>
+                            <div class="heatmap-legend-item">
+                                <div class="heatmap-legend-color" style="background: #FFC107;"></div>
+                                <span>보통</span>
+                            </div>
+                            <div class="heatmap-legend-item">
+                                <div class="heatmap-legend-color" style="background: #4CAF50;"></div>
+                                <span>안전</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
@@ -186,13 +235,6 @@
                 </div>
             </div>
         </section>
-
-        <!-- Today's Intakes -->
-        <section class="intakes-section">
-            <h2>오늘 마신 기록</h2>
-            <div class="intakes-timeline" id="intakesTimeline">
-            </div>
-        </section>
     </main>
 </div>
 
@@ -208,7 +250,6 @@
                 <canvas id="weeklyChart"></canvas>
             </div>
             <div class="weekly-summary" id="weeklySummary">
-                <!-- 통계 요약 표시 -->
             </div>
         </div>
     </div>
@@ -269,6 +310,25 @@
         <div class="modal-footer">
             <button id="saveCustomBtn" class="btn-primary">저장</button>
             <button class="btn-secondary modal-close">취소</button>
+        </div>
+    </div>
+</div>
+
+<!-- Intake Detail Modal -->
+<div id="intakeDetailModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>섭취 상세 정보</h3>
+            <button class="modal-close">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="intake-detail-content" id="intakeDetailContent">
+                <!-- JS로 채워짐 -->
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-secondary modal-close">닫기</button>
+            <button id="deleteIntakeFromDetail" class="btn-danger">삭제</button>
         </div>
     </div>
 </div>
