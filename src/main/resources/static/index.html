@@ -16,7 +16,7 @@
     <div class="login-container">
         <div class="login-hero">
             <h1 class="brand-title">CaFit</h1>
-            <p class="brand-subtitle">내게 <span style="color: #5D4037; font-weight: 700; font-style: italic; border-bottom: 3px solid #5D4037;">fit</span> 한 카페인 관리</p>
+            <p class="brand-subtitle">내게 <span class="fit-highlight">fit</span> 한 카페인 관리</p>
         </div>
 
         <div class="login-forms">
@@ -97,18 +97,46 @@
 
     <!-- Main Content -->
     <main class="app-main">
-        <!-- Today's Summary: 커피컵 게이지 + 섭취 기록 (옆으로 배치) -->
+        <!-- Today's Summary -->
         <section class="summary-section">
             <div class="summary-header">
                 <h2>오늘의 카페인</h2>
                 <div class="summary-date" id="todayDate"></div>
             </div>
 
+            <!-- Quick Add Buttons -->
+            <section class="quick-add-section">
+                <div class="quick-buttons">
+                    <button class="btn-quick" onclick="openQuickAddModal('아메리카노', 150)">
+                        <span class="quick-icon">☕</span>
+                        <span class="quick-label">아메리카노</span>
+                    </button>
+                    <button class="btn-quick" onclick="openQuickAddModal('카페라떼', 75)">
+                        <span class="quick-icon">🥛</span>
+                        <span class="quick-label">라떼</span>
+                    </button>
+                    <button class="btn-quick" onclick="openQuickAddModal('콜드브루', 200)">
+                        <span class="quick-icon">🧊</span>
+                        <span class="quick-label">콜드브루</span>
+                    </button>
+                    <button class="btn-quick" onclick="openQuickAddModal('에너지드링크', 100)">
+                        <span class="quick-icon">⚡</span>
+                        <span class="quick-label">에너지</span>
+                    </button>
+                </div>
+            </section>
+
             <div class="summary-content">
                 <!-- 왼쪽: 커피컵 게이지 -->
                 <div class="coffee-gauge-card">
                     <div class="coffee-cup-wrapper">
                         <div class="coffee-cup">
+                            <!-- 스팀 애니메이션 -->
+                            <div class="steam-container">
+                                <div class="steam s1"></div>
+                                <div class="steam s2"></div>
+                                <div class="steam s3"></div>
+                            </div>
                             <div class="cup-body">
                                 <div class="coffee-fill" id="coffeeFill">
                                     <!-- 웨이브 효과 -->
@@ -184,19 +212,19 @@
                         </div>
                         <div class="heatmap-legend">
                             <div class="heatmap-legend-item">
-                                <div class="heatmap-legend-color" style="background: #C62828;"></div>
+                                <div class="heatmap-legend-color" style="background: #EF5350;"></div>
                                 <span>높음</span>
                             </div>
                             <div class="heatmap-legend-item">
-                                <div class="heatmap-legend-color" style="background: #FF9800;"></div>
+                                <div class="heatmap-legend-color" style="background: #FFA726;"></div>
                                 <span>주의</span>
                             </div>
                             <div class="heatmap-legend-item">
-                                <div class="heatmap-legend-color" style="background: #FFC107;"></div>
+                                <div class="heatmap-legend-color" style="background: #FFEE58;"></div>
                                 <span>보통</span>
                             </div>
                             <div class="heatmap-legend-item">
-                                <div class="heatmap-legend-color" style="background: #4CAF50;"></div>
+                                <div class="heatmap-legend-color" style="background: #66BB6A;"></div>
                                 <span>안전</span>
                             </div>
                         </div>
@@ -277,6 +305,27 @@
         <div class="modal-footer">
             <button class="btn-secondary modal-close">취소</button>
             <button id="confirmIntakeBtn" class="btn-primary">기록하기</button>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Add Modal -->
+<div id="quickAddModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>☕ 빠른 기록</h3>
+            <button class="modal-close">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="selected-beverage" id="quickAddBeverageInfo"></div>
+            <div class="form-group">
+                <label>섭취 시간</label>
+                <input type="datetime-local" id="quickConsumedAtInput">
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-secondary modal-close">취소</button>
+            <button id="confirmQuickAddBtn" class="btn-primary">기록하기</button>
         </div>
     </div>
 </div>

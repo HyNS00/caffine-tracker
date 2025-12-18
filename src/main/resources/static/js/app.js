@@ -101,16 +101,21 @@ function setupSidebar() {
     sidebarOverlay?.addEventListener('click', closeSidebar);
 
     // 사이드바 로그아웃
-    sidebarLogout?.addEventListener('click', async () => {
+    sidebarLogout?.addEventListener('click', async (e) => {
+        e.preventDefault();
         stopPolling(); // 폴링 중지
+
+        // API 호출 시도 (실패해도 무시)
         try {
             await AuthAPI.logout();
-            sessionStorage.removeItem('user');
-            closeSidebar();
-            showLoginScreen();
         } catch (error) {
-            console.error('로그아웃 실패:', error);
+            console.log('로그아웃 API:', error.message);
         }
+
+        // 무조건 로그아웃 처리
+        sessionStorage.removeItem('user');
+        closeSidebar();
+        showLoginScreen();
     });
 
     // 주간 통계 메뉴
@@ -399,8 +404,8 @@ function renderCaffeineChart() {
 
     const ctx2d = canvas.getContext('2d');
     const gradient = ctx2d.createLinearGradient(0, 0, 0, 250);
-    gradient.addColorStop(0, 'rgba(44, 110, 73, 0.4)');
-    gradient.addColorStop(1, 'rgba(44, 110, 73, 0.0)');
+    gradient.addColorStop(0, 'rgba(212, 163, 115, 0.5)');  // 라떼 색상
+    gradient.addColorStop(1, 'rgba(212, 163, 115, 0.0)');
 
     // 1) 최초 1회 생성: "0에서 천천히 자라기"
     if (!caffeineChart) {
@@ -414,24 +419,24 @@ function renderCaffeineChart() {
                     {
                         label: '체내 카페인',
                         data: zeros,  // 처음엔 0으로 시작
-                        borderColor: '#2C6E49',
+                        borderColor: '#D4A373',
                         backgroundColor: gradient,
                         borderWidth: 3,
                         fill: true,
                         tension: 0.4,
                         pointRadius: 5,
-                        pointBackgroundColor: '#fff',
-                        pointBorderColor: '#2C6E49',
+                        pointBackgroundColor: '#1E1E1E',
+                        pointBorderColor: '#D4A373',
                         pointBorderWidth: 2,
                         pointHoverRadius: 8,
-                        pointHoverBackgroundColor: '#2C6E49',
+                        pointHoverBackgroundColor: '#D4A373',
                         pointHoverBorderColor: '#fff',
                         pointHoverBorderWidth: 2,
                     },
                     {
                         label: '목표 수면 카페인',
                         data: targetLine,
-                        borderColor: '#E57373',
+                        borderColor: '#66BB6A',
                         borderWidth: 2,
                         borderDash: [5, 5],
                         pointRadius: 0,
@@ -440,7 +445,7 @@ function renderCaffeineChart() {
                     {
                         label: '일일 한계량',
                         data: limitLine,
-                        borderColor: '#FF9800',
+                        borderColor: '#EF5350',
                         borderWidth: 2,
                         borderDash: [10, 5],
                         pointRadius: 0,
@@ -462,8 +467,8 @@ function renderCaffeineChart() {
                 plugins: {
                     legend: { display: false },
                     tooltip: {
-                        backgroundColor: 'rgba(45, 48, 71, 0.9)',
-                        titleColor: '#fff',
+                        backgroundColor: 'rgba(30, 30, 30, 0.95)',
+                        titleColor: '#D4A373',
                         bodyColor: '#fff',
                         padding: 12,
                         cornerRadius: 8,
@@ -483,8 +488,9 @@ function renderCaffeineChart() {
                 scales: {
                     y: {
                         beginAtZero: true,
-                        grid: { color: 'rgba(0,0,0,0.05)' },
+                        grid: { color: 'rgba(255,255,255,0.1)' },
                         ticks: {
+                            color: '#B0B0B0',
                             callback: function(value) {
                                 return value + 'mg';
                             }
@@ -493,6 +499,7 @@ function renderCaffeineChart() {
                     x: {
                         grid: { display: false },
                         ticks: {
+                            color: '#B0B0B0',
                             maxRotation: 0,
                             autoSkip: true,
                             maxTicksLimit: 8,
@@ -544,16 +551,16 @@ function renderHeatmap() {
         const hour = time.getHours();
         const value = Math.round(point.caffeineMg);
 
-        // 색상 결정
+        // 색상 결정 (다크 테마용)
         let color;
         if (value > targetSleepCaffeine * 3) {
-            color = '#C62828'; // 높음
+            color = '#EF5350'; // 높음
         } else if (value > targetSleepCaffeine * 2) {
-            color = '#FF9800'; // 주의
+            color = '#FFA726'; // 주의
         } else if (value > targetSleepCaffeine) {
-            color = '#FFC107'; // 보통
+            color = '#FFEE58'; // 보통
         } else {
-            color = '#4CAF50'; // 안전
+            color = '#66BB6A'; // 안전
         }
 
         return `
@@ -1203,3 +1210,152 @@ async function deleteIntake(intakeId) {
         alert('삭제 실패: ' + error.message);
     }
 }
+
+// ========================================
+// 퀵 추가 기능
+// ========================================
+let quickAddData = null;
+
+function openQuickAddModal(name, caffeineMg) {
+    quickAddData = { name, caffeineMg };
+
+    const infoEl = document.getElementById('quickAddBeverageInfo');
+    if (infoEl) {
+        infoEl.innerHTML = `
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <div style="font-weight: 600; font-size: 1.1rem; color: var(--text-primary);">☕ ${name}</div>
+                    <div style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 4px;">빠른 기록</div>
+                </div>
+                <div style="background: rgba(212, 163, 115, 0.2); padding: 8px 16px; border-radius: 50px;">
+                    <span style="font-weight: 700; color: var(--primary);">${caffeineMg}mg</span>
+                </div>
+            </div>
+        `;
+    }
+
+    // 현재 시간 설정
+    const now = new Date();
+    const localDateTime = new Date(now.getTime() - now.getTimezoneOffset() * 60000)
+        .toISOString()
+        .slice(0, 16);
+    const inputEl = document.getElementById('quickConsumedAtInput');
+    if (inputEl) {
+        inputEl.value = localDateTime;
+    }
+
+    document.getElementById('quickAddModal')?.classList.add('active');
+}
+
+async function confirmQuickAdd() {
+    if (!quickAddData) return;
+
+    const consumedAt = document.getElementById('quickConsumedAtInput')?.value;
+    if (!consumedAt) {
+        alert('섭취 시간을 선택해주세요');
+        return;
+    }
+
+    try {
+        // 커스텀 음료로 직접 기록 (API가 지원하면)
+        // 현재는 간단히 알림만 표시
+        const isoDateTime = consumedAt + ':00';
+
+        // IntakeAPI에 직접 기록하는 엔드포인트가 있다면 사용
+        // 없으면 검색 후 첫 번째 결과로 기록하는 방식 사용
+        const searchResult = await BeverageAPI.search(quickAddData.name);
+        if (searchResult && searchResult.length > 0) {
+            // 카페인량이 비슷한 음료 찾기
+            const matched = searchResult.find(b =>
+                Math.abs(b.caffeineMg - quickAddData.caffeineMg) < 30
+            ) || searchResult[0];
+
+            await IntakeAPI.recordPreset(matched.id, isoDateTime);
+
+            closeAllModals();
+            await loadTodayIntakes();
+            await loadCaffeineStatus();
+            await loadTimeline();
+
+            // 성공 피드백
+            showToast(`☕ ${quickAddData.name} 기록 완료!`);
+        } else {
+            alert('해당 음료를 찾을 수 없습니다. 음료 검색에서 직접 선택해주세요.');
+        }
+    } catch (error) {
+        alert('기록 실패: ' + error.message);
+    }
+}
+
+// 토스트 메시지 표시
+function showToast(message) {
+    // 기존 토스트 제거
+    const existingToast = document.querySelector('.toast-message');
+    if (existingToast) {
+        existingToast.remove();
+    }
+
+    const toast = document.createElement('div');
+    toast.className = 'toast-message';
+    toast.textContent = message;
+    toast.style.cssText = `
+        position: fixed;
+        bottom: 30px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: var(--primary);
+        color: var(--bg-main);
+        padding: 12px 24px;
+        border-radius: 50px;
+        font-weight: 600;
+        z-index: 9999;
+        animation: toastIn 0.3s ease-out;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    `;
+
+    document.body.appendChild(toast);
+
+    // 3초 후 제거
+    setTimeout(() => {
+        toast.style.animation = 'toastOut 0.3s ease-in forwards';
+        setTimeout(() => toast.remove(), 300);
+    }, 3000);
+}
+
+// 퀵 추가 모달 이벤트 설정
+document.addEventListener('DOMContentLoaded', () => {
+    const confirmQuickAddBtn = document.getElementById('confirmQuickAddBtn');
+    if (confirmQuickAddBtn) {
+        confirmQuickAddBtn.addEventListener('click', confirmQuickAdd);
+    }
+
+    // 퀵 추가 모달 닫기
+    const quickAddModal = document.getElementById('quickAddModal');
+    quickAddModal?.querySelectorAll('.modal-close').forEach(btn => {
+        btn.addEventListener('click', () => {
+            quickAddModal.classList.remove('active');
+            quickAddData = null;
+        });
+    });
+
+    quickAddModal?.addEventListener('click', (e) => {
+        if (e.target === quickAddModal) {
+            quickAddModal.classList.remove('active');
+            quickAddData = null;
+        }
+    });
+});
+
+// 토스트 애니메이션 CSS 추가
+const toastStyle = document.createElement('style');
+toastStyle.textContent = `
+    @keyframes toastIn {
+        from { opacity: 0; transform: translateX(-50%) translateY(20px); }
+        to { opacity: 1; transform: translateX(-50%) translateY(0); }
+    }
+    @keyframes toastOut {
+        from { opacity: 1; transform: translateX(-50%) translateY(0); }
+        to { opacity: 0; transform: translateX(-50%) translateY(20px); }
+    }
+`;
+document.head.appendChild(toastStyle);
