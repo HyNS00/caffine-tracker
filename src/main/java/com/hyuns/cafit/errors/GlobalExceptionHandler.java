@@ -7,6 +7,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -56,5 +57,22 @@ public class GlobalExceptionHandler {
         );
 
         return ResponseEntity.status(errorMessage.getHttpStatus()).body(response);
+    }
+
+    // 추가
+    /**
+     * 정적 리소스를 찾을 수 없는 경우 (Chrome DevTools 등)
+     * ERROR 대신 DEBUG 레벨로 처리
+     */
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<ErrorResponse> handleNoResourceFoundException(NoResourceFoundException e) {
+        log.debug("Static resource not found: {}", e.getMessage());
+
+        ErrorResponse response = ErrorResponse.of(
+                "NOT_FOUND",
+                "요청한 리소스를 찾을 수 없습니다"
+        );
+
+        return ResponseEntity.status(404).body(response);
     }
 }

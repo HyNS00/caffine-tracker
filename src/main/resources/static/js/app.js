@@ -386,126 +386,150 @@ async function loadTimeline() {
 }
 
 function renderCaffeineChart() {
-    const ctx = document.getElementById('caffeineChart');
-    if (!ctx || !timelineData || !currentCaffeineStatus) return;
+    const canvas = document.getElementById('caffeineChart');
+    if (!canvas || !timelineData || !currentCaffeineStatus) return;
 
-    if (caffeineChart) {
-        caffeineChart.destroy();
-    }
-
-    const { dataPoints, targetSleepCaffeine, bedtime } = timelineData;
+    const { dataPoints, targetSleepCaffeine } = timelineData;
     const dailyLimit = currentCaffeineStatus.settings.dailyLimitMg;
 
-    const labels = dataPoints.map(point => {
-        const time = new Date(point.time);
-        return `${time.getHours()}시`;
-    });
-
-    const caffeineValues = dataPoints.map(point => Math.round(point.caffeineMg * 10) / 10);
+    const labels = dataPoints.map(p => `${new Date(p.time).getHours()}시`);
+    const caffeineValues = dataPoints.map(p => Math.round(p.caffeineMg * 10) / 10);
     const targetLine = Array(dataPoints.length).fill(targetSleepCaffeine);
-    const limitLine = Array(dataPoints.length).fill(dailyLimit); // 400mg 한계선
+    const limitLine = Array(dataPoints.length).fill(dailyLimit);
 
-    // 그라데이션 생성
-    const gradient = ctx.getContext('2d').createLinearGradient(0, 0, 0, 250);
+    const ctx2d = canvas.getContext('2d');
+    const gradient = ctx2d.createLinearGradient(0, 0, 0, 250);
     gradient.addColorStop(0, 'rgba(44, 110, 73, 0.4)');
     gradient.addColorStop(1, 'rgba(44, 110, 73, 0.0)');
 
-    caffeineChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: labels,
-            datasets: [
-                {
-                    label: '체내 카페인',
-                    data: caffeineValues,
-                    borderColor: '#2C6E49',
-                    backgroundColor: gradient,
-                    borderWidth: 3,
-                    fill: true,
-                    tension: 0.4,
-                    pointRadius: 5,
-                    pointBackgroundColor: '#fff',
-                    pointBorderColor: '#2C6E49',
-                    pointBorderWidth: 2,
-                    pointHoverRadius: 8,
-                    pointHoverBackgroundColor: '#2C6E49',
-                    pointHoverBorderColor: '#fff',
-                    pointHoverBorderWidth: 2,
-                },
-                {
-                    label: '목표 수면 카페인',
-                    data: targetLine,
-                    borderColor: '#E57373',
-                    borderWidth: 2,
-                    borderDash: [5, 5],
-                    pointRadius: 0,
-                    fill: false,
-                },
-                {
-                    label: '일일 한계량',
-                    data: limitLine,
-                    borderColor: '#FF9800',
-                    borderWidth: 2,
-                    borderDash: [10, 5],
-                    pointRadius: 0,
-                    fill: false,
-                }
-            ]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            // 차트 애니메이션: 천천히 올라오는 효과
-            animation: {
-                duration: 3000,
-                easing: 'easeOutCubic',
+    // 1) 최초 1회 생성: "0에서 천천히 자라기"
+    if (!caffeineChart) {
+        const zeros = Array(dataPoints.length).fill(0);
+
+        caffeineChart = new Chart(canvas, {
+            type: 'line',
+            data: {
+                labels,
+                datasets: [
+                    {
+                        label: '체내 카페인',
+                        data: zeros,  // 처음엔 0으로 시작
+                        borderColor: '#2C6E49',
+                        backgroundColor: gradient,
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 5,
+                        pointBackgroundColor: '#fff',
+                        pointBorderColor: '#2C6E49',
+                        pointBorderWidth: 2,
+                        pointHoverRadius: 8,
+                        pointHoverBackgroundColor: '#2C6E49',
+                        pointHoverBorderColor: '#fff',
+                        pointHoverBorderWidth: 2,
+                    },
+                    {
+                        label: '목표 수면 카페인',
+                        data: targetLine,
+                        borderColor: '#E57373',
+                        borderWidth: 2,
+                        borderDash: [5, 5],
+                        pointRadius: 0,
+                        fill: false,
+                    },
+                    {
+                        label: '일일 한계량',
+                        data: limitLine,
+                        borderColor: '#FF9800',
+                        borderWidth: 2,
+                        borderDash: [10, 5],
+                        pointRadius: 0,
+                        fill: false,
+                    }
+                ]
             },
-            interaction: {
-                intersect: false,
-                mode: 'index',
-            },
-            plugins: {
-                legend: { display: false },
-                tooltip: {
-                    backgroundColor: 'rgba(45, 48, 71, 0.9)',
-                    titleColor: '#fff',
-                    bodyColor: '#fff',
-                    padding: 12,
-                    cornerRadius: 8,
-                    callbacks: {
-                        label: function(context) {
-                            if (context.datasetIndex === 0) {
-                                return `카페인: ${context.raw}mg`;
-                            } else if (context.datasetIndex === 1) {
-                                return `목표: ${context.raw}mg`;
-                            } else {
-                                return `한계: ${context.raw}mg`;
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: {
+                    duration: 3000,  // 3초 동안 천천히 올라옴
+                    easing: 'easeOutCubic',
+                },
+                interaction: {
+                    intersect: false,
+                    mode: 'index',
+                },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: 'rgba(45, 48, 71, 0.9)',
+                        titleColor: '#fff',
+                        bodyColor: '#fff',
+                        padding: 12,
+                        cornerRadius: 8,
+                        callbacks: {
+                            label: function(context) {
+                                if (context.datasetIndex === 0) {
+                                    return `카페인: ${context.raw}mg`;
+                                } else if (context.datasetIndex === 1) {
+                                    return `목표: ${context.raw}mg`;
+                                } else {
+                                    return `한계: ${context.raw}mg`;
+                                }
                             }
                         }
                     }
-                }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    grid: { color: 'rgba(0,0,0,0.05)' },
-                    ticks: {
-                        callback: function(value) {
-                            return value + 'mg';
-                        }
-                    }
                 },
-                x: {
-                    grid: { display: false },
-                    ticks: {
-                        maxRotation: 0,
-                        autoSkip: true,
-                        maxTicksLimit: 8,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: 'rgba(0,0,0,0.05)' },
+                        ticks: {
+                            callback: function(value) {
+                                return value + 'mg';
+                            }
+                        }
+                    },
+                    x: {
+                        grid: { display: false },
+                        ticks: {
+                            maxRotation: 0,
+                            autoSkip: true,
+                            maxTicksLimit: 8,
+                        }
                     }
                 }
             }
-        }
-    });
+        });
+
+        // 생성 직후 실제 값으로 업데이트 → 0에서 천천히 올라감!
+        requestAnimationFrame(() => {
+            caffeineChart.data.datasets[0].data = caffeineValues;
+            caffeineChart.update();
+        });
+        return;
+    }
+
+    // 2) 이후 갱신(폴링/추가/삭제): 데이터만 교체하고 부드럽게 이동
+    const prev = caffeineChart.data.datasets[0].data;
+    const same =
+        prev.length === caffeineValues.length &&
+        prev.every((v, i) => v === caffeineValues[i]) &&
+        caffeineChart.data.labels.length === labels.length &&
+        caffeineChart.data.labels.every((v, i) => v === labels[i]);
+
+    if (same) return;  // 데이터 동일하면 스킵 (불필요한 애니메이션 방지)
+
+    // 폴링 시에는 짧은 애니메이션으로 부드럽게
+    caffeineChart.options.animation = {
+        duration: 800,
+        easing: 'easeInOutCubic',
+    };
+    caffeineChart.data.labels = labels;
+    caffeineChart.data.datasets[0].data = caffeineValues;
+    caffeineChart.data.datasets[1].data = targetLine;
+    caffeineChart.data.datasets[2].data = limitLine;
+    caffeineChart.update();
 }
 
 // 히트맵 렌더링

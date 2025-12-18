@@ -14,7 +14,7 @@ async function fetchAPI(url, options = {}) {
 
     if (response.status === 401) {
         sessionStorage.removeItem('user');
-        window.location.href = '/';
+        // 리다이렉트는 auth.js에서 처리 (무한루프 방지)
         throw new Error('로그인이 필요합니다');
     }
 
