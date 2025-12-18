@@ -364,10 +364,17 @@ body {
     align-items: center;
     gap: 1rem;
     padding: 1rem;
+    width: 100%;
     color: var(--text-primary);
     text-decoration: none;
     border-radius: 12px;
     transition: all 0.3s ease;
+    background: none;
+    border: none;
+    font-size: 1rem;
+    font-family: inherit;
+    cursor: pointer;
+    text-align: left;
 }
 
 .sidebar-item:hover {
