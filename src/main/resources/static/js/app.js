@@ -196,6 +196,10 @@ function renderWeeklyChart() {
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            animation: {
+                duration: 1500,
+                easing: 'easeOutQuart'
+            },
             plugins: {
                 legend: {
                     position: 'bottom',
@@ -306,11 +310,14 @@ function updateCoffeeCupGauge(currentMg, limitMg) {
 
     // 색상 변경 - 커피 톤으로 (진할수록 많이 마신 것)
     if (percentage > 80) {
-        fillElement.style.background = 'linear-gradient(180deg, #3E2723 0%, #1B0000 100%)'; // 진한 에스프레소
+        fillElement.style.setProperty('--coffee-color-start', '#3E2723');
+        fillElement.style.setProperty('--coffee-color-end', '#1B0000');
     } else if (percentage > 50) {
-        fillElement.style.background = 'linear-gradient(180deg, #5D4037 0%, #3E2723 100%)'; // 중간 커피
+        fillElement.style.setProperty('--coffee-color-start', '#5D4037');
+        fillElement.style.setProperty('--coffee-color-end', '#3E2723');
     } else {
-        fillElement.style.background = 'linear-gradient(180deg, #8D6E63 0%, #5D4037 100%)'; // 연한 커피
+        fillElement.style.setProperty('--coffee-color-start', '#8D6E63');
+        fillElement.style.setProperty('--coffee-color-end', '#5D4037');
     }
 
     // 값 표시
@@ -366,7 +373,7 @@ function setupChartTabs() {
 }
 
 // ========================================
-// 타임라인 차트 (1+3 스타일: 그라데이션 + 도트)
+// 타임라인 차트 (애니메이션 + 400mg 한계선)
 // ========================================
 async function loadTimeline() {
     try {
@@ -380,13 +387,14 @@ async function loadTimeline() {
 
 function renderCaffeineChart() {
     const ctx = document.getElementById('caffeineChart');
-    if (!ctx || !timelineData) return;
+    if (!ctx || !timelineData || !currentCaffeineStatus) return;
 
     if (caffeineChart) {
         caffeineChart.destroy();
     }
 
     const { dataPoints, targetSleepCaffeine, bedtime } = timelineData;
+    const dailyLimit = currentCaffeineStatus.settings.dailyLimitMg;
 
     const labels = dataPoints.map(point => {
         const time = new Date(point.time);
@@ -395,8 +403,9 @@ function renderCaffeineChart() {
 
     const caffeineValues = dataPoints.map(point => Math.round(point.caffeineMg * 10) / 10);
     const targetLine = Array(dataPoints.length).fill(targetSleepCaffeine);
+    const limitLine = Array(dataPoints.length).fill(dailyLimit); // 400mg 한계선
 
-    // 그라데이션 생성 (1번 스타일)
+    // 그라데이션 생성
     const gradient = ctx.getContext('2d').createLinearGradient(0, 0, 0, 250);
     gradient.addColorStop(0, 'rgba(44, 110, 73, 0.4)');
     gradient.addColorStop(1, 'rgba(44, 110, 73, 0.0)');
@@ -414,7 +423,6 @@ function renderCaffeineChart() {
                     borderWidth: 3,
                     fill: true,
                     tension: 0.4,
-                    // 3번 스타일 도트
                     pointRadius: 5,
                     pointBackgroundColor: '#fff',
                     pointBorderColor: '#2C6E49',
@@ -432,12 +440,26 @@ function renderCaffeineChart() {
                     borderDash: [5, 5],
                     pointRadius: 0,
                     fill: false,
+                },
+                {
+                    label: '일일 한계량',
+                    data: limitLine,
+                    borderColor: '#FF9800',
+                    borderWidth: 2,
+                    borderDash: [10, 5],
+                    pointRadius: 0,
+                    fill: false,
                 }
             ]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            // 차트 애니메이션: 천천히 올라오는 효과
+            animation: {
+                duration: 3000,
+                easing: 'easeOutCubic',
+            },
             interaction: {
                 intersect: false,
                 mode: 'index',
@@ -454,8 +476,11 @@ function renderCaffeineChart() {
                         label: function(context) {
                             if (context.datasetIndex === 0) {
                                 return `카페인: ${context.raw}mg`;
+                            } else if (context.datasetIndex === 1) {
+                                return `목표: ${context.raw}mg`;
+                            } else {
+                                return `한계: ${context.raw}mg`;
                             }
-                            return `목표: ${context.raw}mg`;
                         }
                     }
                 }

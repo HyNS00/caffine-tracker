@@ -71,8 +71,8 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
     }
 });
 
-// 로그아웃
-document.getElementById('logoutBtn').addEventListener('click', async () => {
+// 로그아웃 (헤더 버튼 - 없을 수도 있음)
+document.getElementById('logoutBtn')?.addEventListener('click', async () => {
     try {
         await AuthAPI.logout();
         sessionStorage.removeItem('user');
