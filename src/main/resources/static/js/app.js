@@ -892,8 +892,15 @@ function updateCaffeineEstimate() {
 
     const category = categories.find(c => c.code === categoryCode);
     if (category) {
-        const estimatedCaffeine = (category.caffeineMgPer100ml * volume / 100).toFixed(1);
-        document.getElementById('customCaffeine').value = estimatedCaffeine;
+        const isDefaultVolume = volume === category.defaultServingSizeMl;
+
+        if (isDefaultVolume) {
+            // 백엔드에서 받은 값 사용
+            document.getElementById('customCaffeine').value = category.defaultCaffeineMg.toFixed(1);
+        } else {
+            const estimatedCaffeine = (category.caffeineMgPer100ml * volume / 100).toFixed(1);
+            document.getElementById('customCaffeine').value = estimatedCaffeine;
+        }
     }
 }
 
