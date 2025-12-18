@@ -75,17 +75,22 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
 document.getElementById('logoutBtn')?.addEventListener('click', async () => {
     try {
         await AuthAPI.logout();
-        sessionStorage.removeItem('user');
-        showLoginScreen();
     } catch (error) {
-        console.error('로그아웃 실패:', error);
+        console.log('로그아웃 API:', error.message);
     }
+    // 무조건 로그아웃 처리
+    sessionStorage.removeItem('user');
+    showLoginScreen();
 });
 
 // 화면 전환 함수
 function showLoginScreen() {
     document.getElementById('loginScreen').classList.add('active');
     document.getElementById('appScreen').classList.remove('active');
+
+    // 로그인 폼 초기화
+    document.getElementById('loginForm')?.reset();
+    document.getElementById('loginError')?.classList.remove('show');
 }
 
 function showAppScreen() {
