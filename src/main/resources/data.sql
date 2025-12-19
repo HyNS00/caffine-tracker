@@ -12,7 +12,7 @@
 INSERT INTO preset_beverages (name, brand_name, category, volume_ml, caffeine_mg) VALUES
                                                                                       ('아메리카노', '스타벅스', 'AMERICANO', 355, 150.0),
                                                                                       ('아메리카노', '스타벅스', 'AMERICANO', 473, 225.0),
-                                                                                      ('아메리카노', '스타벅스', 'AMERICANO', 591, 281.0),
+                                                                                      ('아메리카노', '스타벅스', 'AMERICANO', 591, 300.0),
                                                                                       ('카페라떼', '스타벅스', 'LATTE', 355, 75.0),
                                                                                       ('카페라떼', '스타벅스', 'LATTE', 473, 150.0),
                                                                                       ('카푸치노', '스타벅스', 'CAPPUCCINO', 355, 75.0),
@@ -205,3 +205,4 @@ INSERT INTO preset_beverages (name, brand_name, category, volume_ml, caffeine_mg
 -- 테스트용 데이터
 INSERT INTO users (email, password, name, daily_caffeine_limit, caffeine_half_life, bed_time, target_sleep_caffeine)
 VALUES ('test@test.com', 'test1234', '테스트', 400, 5.0, '23:00:00', 50.0);
+
