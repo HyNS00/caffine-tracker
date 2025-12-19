@@ -2,11 +2,11 @@
    CaFit Dark Roast Theme
    ========================================= */
 :root {
-    /* 다크 배경 */
-    --bg-main: #121212;
-    --bg-card: #1E1E1E;
-    --bg-card-hover: #252525;
-    --bg-input: #252525;
+    /* 다크 배경 - 약간 밝게 */
+    --bg-main: #1a1a1a;
+    --bg-card: #242424;
+    --bg-card-hover: #2e2e2e;
+    --bg-input: #2e2e2e;
 
     /* 커피 톤 포인트 컬러 */
     --primary: #D4A373;
@@ -15,14 +15,14 @@
     --accent: #FAEDCD;
     --accent-dark: #DDD5B8;
 
-    /* 텍스트 컬러 */
+    /* 텍스트 컬러 - 약간 밝게 */
     --text-primary: #FFFFFF;
-    --text-secondary: #B0B0B0;
-    --text-light: #707070;
+    --text-secondary: #c0c0c0;
+    --text-light: #888888;
 
-    /* 테두리 */
-    --border: #333333;
-    --border-light: #444444;
+    /* 테두리 - 약간 밝게 */
+    --border: #3d3d3d;
+    --border-light: #4a4a4a;
 
     /* 그림자 */
     --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
@@ -1465,8 +1465,48 @@ body {
 
 .weekly-summary {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(2, 1fr);
     gap: 1rem;
+}
+
+/* 주간 통계 summary-grid (app.js에서 사용) */
+.summary-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+}
+
+.summary-item {
+    text-align: center;
+    padding: 1.25rem 1rem;
+    background: var(--bg-card-hover);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+}
+
+.summary-item.warning {
+    border-color: var(--warning);
+    background: var(--warning-bg);
+}
+
+.summary-item .summary-value {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--primary);
+    line-height: 1.2;
+}
+
+.summary-item .summary-value span {
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    margin-left: 2px;
+}
+
+.summary-item .summary-label {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin-top: 0.5rem;
 }
 
 .weekly-stat-item {
@@ -1530,6 +1570,8 @@ body {
     .comparison-arrow { transform: rotate(90deg); }
 
     .weekly-summary { grid-template-columns: 1fr; }
+
+    .summary-grid { grid-template-columns: 1fr; }
 
     .heatmap-cell { width: calc(33.33% - 6px); }
 }
