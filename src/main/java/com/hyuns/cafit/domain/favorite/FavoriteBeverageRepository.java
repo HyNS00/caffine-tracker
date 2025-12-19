@@ -8,7 +8,6 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface FavoriteBeverageRepository extends CrudRepository<FavoriteBeverage, Long> {
     List<FavoriteBeverage> findByUserOrderByDisplayOrderAsc(User user);
@@ -20,4 +19,10 @@ public interface FavoriteBeverageRepository extends CrudRepository<FavoriteBever
     @Query("SELECT COALESCE(MAX(f.displayOrder),0) FROM FavoriteBeverage f WHERE f.user = :user")
     int findMaxOrderByUser(@Param("user") User user);
 
+    @Query("SELECT f FROM FavoriteBeverage f " +
+            "LEFT JOIN FETCH f.presetBeverage " +
+            "LEFT JOIN FETCH f.customBeverage " +
+            "WHERE f.user = :user " +
+            "ORDER BY f.displayOrder ASC")
+    List<FavoriteBeverage> findByUserWithBeverages(@Param("user") User user);
 }
