@@ -74,6 +74,19 @@ public class CustomBeverageService {
         customBeverageRepository.delete(beverage);
     }
 
+    @Transactional(readOnly = true)
+    public CustomBeverage getById(Long id) {
+        return customBeverageRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(ErrorMessage.CUSTOM_BEVERAGE_NOT_FOUND));
+    }
+
+    @Transactional(readOnly = true)
+    public CustomBeverage getByIdAndValidateOwnership(Long id, User user) {
+        CustomBeverage beverage = getById(id);
+        validateOwnership(beverage, user);
+        return beverage;
+    }
+
     private CustomBeverage findByIdOrThrow(Long beverageId) {
         return customBeverageRepository.findById(beverageId)
                 .orElseThrow(() -> new EntityNotFoundException(
