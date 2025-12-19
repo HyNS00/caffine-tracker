@@ -40,8 +40,8 @@ public enum ErrorMessage {
     // Favorite Beverage
     FAVORITE_NOT_FOUND("FAVORITE_NOT_FOUND", "즐겨찾기를 찾을 수 없습니다", HttpStatus.NOT_FOUND),
     DUPLICATE_FAVORITE("DUPLICATE_FAVORITE", "이미 즐겨찾기에 추가된 음료입니다", HttpStatus.CONFLICT),
-    UNAUTHORIZED_FAVORITE_ACCESS("UNAUTHORIZED_FAVORITE_ACCESS", "해당 즐겨찾기에 대한 권한이 없습니다", HttpStatus.FORBIDDEN);
-
+    UNAUTHORIZED_FAVORITE_ACCESS("UNAUTHORIZED_FAVORITE_ACCESS", "해당 즐겨찾기에 대한 권한이 없습니다", HttpStatus.FORBIDDEN),
+    INVALID_FAVORITE_LIST("INVALID_FAVORITE_LIST", "즐겨찾기 목록이 올바르지 않습니다", HttpStatus.BAD_REQUEST);
 
     private final String code;
     private final String message;
