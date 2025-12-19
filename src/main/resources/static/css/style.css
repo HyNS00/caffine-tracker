@@ -1609,3 +1609,72 @@ body {
     color: var(--primary-light);
     text-decoration: underline;
 }
+
+.weekly-stats-row {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.weekly-stats-row .weekly-summary {
+    flex: 1;
+}
+
+.weekly-stats-row #topBeveragesContainer {
+    flex: 1;
+}
+
+/* TOP 음료 스타일 */
+.top-beverages-card h4 {
+    color: var(--primary);
+    margin-bottom: 1rem;
+    font-size: 1rem;
+}
+
+.top-beverages-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.top-beverage-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem 1rem;
+    background: var(--bg-card-hover);
+    border-radius: 12px;
+}
+
+.top-rank {
+    width: 28px;
+    height: 28px;
+    background: var(--primary);
+    color: var(--bg-main);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.9rem;
+}
+
+.top-beverage-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.top-beverage-name {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.top-beverage-detail {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.top-beverages-empty {
+    text-align: center;
+    padding: 2rem;
+    color: var(--text-light);
+}

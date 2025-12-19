@@ -232,8 +232,8 @@ const CaffeineAPI = {
 // Statistics API
 const StatisticsAPI = {
     getTimeline: (hours = 12) => fetchAPI(`${API_BASE}/statistics/timeline?hours=${hours}`),
-
     getDailyStatistics: (days = 7) => fetchAPI(`${API_BASE}/statistics/daily?days=${days}`),
+    getTopBeverages: (days = 7) => fetchAPI(`${API_BASE}/statistics/top-beverages?days=${days}`),
 };
 
 // Favorite API (신규)

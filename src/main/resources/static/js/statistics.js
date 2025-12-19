@@ -11,8 +11,10 @@ async function openWeeklyStatsModal() {
 
     try {
         AppState.dailyStatsData = await StatisticsAPI.getDailyStatistics(7);
+        AppState.topBeverages = await StatisticsAPI.getTopBeverages(7);
         renderWeeklyChart();
         renderWeeklySummary();
+        renderTopBeverages();
     } catch (error) {
         console.error('주간 통계 로드 실패:', error);
     }
@@ -129,6 +131,35 @@ function renderWeeklySummary() {
                 <div class="summary-value">${Math.round(maxDay.totalCaffeineMg)}<span>mg</span></div>
                 <div class="summary-label">최대 섭취일</div>
             </div>
+        </div>
+    `;
+}
+// top 음료
+function renderTopBeverages() {
+    const container = document.getElementById('topBeveragesContainer');
+    if (!container || !AppState.topBeverages) return;
+
+    if (AppState.topBeverages.length === 0) {
+        container.innerHTML = `
+            <div class="top-beverages-empty">
+                <p>이번 주 섭취 기록이 없습니다</p>
+            </div>
+        `;
+        return;
+    }
+
+    container.innerHTML = `
+        <h4>🏆 이번 주 TOP 음료</h4>
+        <div class="top-beverages-list">
+            ${AppState.topBeverages.map((bev, index) => `
+                <div class="top-beverage-item">
+                    <span class="top-rank">${index + 1}</span>
+                    <div class="top-beverage-info">
+                        <span class="top-beverage-name">${bev.brandName ? bev.brandName + ' ' : ''}${bev.beverageName}</span>
+                        <span class="top-beverage-detail">${bev.volumeMl}ml · ${bev.count}회</span>
+                    </div>
+                </div>
+            `).join('')}
         </div>
     `;
 }
