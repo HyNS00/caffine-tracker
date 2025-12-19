@@ -11,265 +11,218 @@
     <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
-<!-- Login Screen -->
-<div id="loginScreen" class="screen active">
-    <div class="login-container">
-        <div class="login-hero">
-            <h1 class="brand-title">CaFit</h1>
-            <p class="brand-subtitle">내게 <span class="fit-highlight">fit</span> 한 카페인 관리</p>
-        </div>
-
-        <div class="login-forms">
-            <div class="tab-buttons">
-                <button class="tab-btn active" data-tab="login">로그인</button>
-                <button class="tab-btn" data-tab="signup">회원가입</button>
-            </div>
-
-            <!-- Login Form -->
-            <form id="loginForm" class="auth-form active">
-                <div class="form-group">
-                    <input type="email" id="loginEmail" placeholder="이메일" required>
-                </div>
-                <div class="form-group">
-                    <input type="password" id="loginPassword" placeholder="비밀번호" required>
-                </div>
-                <button type="submit" class="btn-primary">로그인</button>
-                <div id="loginError" class="error-message"></div>
-            </form>
-
-            <!-- Signup Form -->
-            <form id="signupForm" class="auth-form">
-                <div class="form-group">
-                    <input type="text" id="signupName" placeholder="이름" required>
-                </div>
-                <div class="form-group">
-                    <input type="email" id="signupEmail" placeholder="이메일" required>
-                </div>
-                <div class="form-group">
-                    <input type="password" id="signupPassword" placeholder="비밀번호 (4자 이상)" required>
-                </div>
-                <button type="submit" class="btn-primary">가입하기</button>
-                <div id="signupError" class="error-message"></div>
-            </form>
+<!-- Header -->
+<header class="app-header">
+    <div class="header-content">
+        <h1 class="app-logo">CaFit</h1>
+        <div class="header-actions">
+            <span id="userName" class="user-name"></span>
+            <button id="menuBtn" class="btn-menu">☰</button>
         </div>
     </div>
-</div>
+</header>
 
-<!-- Main App Screen -->
-<div id="appScreen" class="screen">
-    <!-- Header -->
-    <header class="app-header">
-        <div class="header-content">
-            <h1 class="app-logo">CaFit</h1>
-            <div class="header-actions">
-                <span id="userName" class="user-name"></span>
-                <button id="menuBtn" class="btn-menu">☰</button>
+<!-- Sidebar -->
+<div id="sidebarOverlay" class="sidebar-overlay"></div>
+<aside id="sidebar" class="sidebar">
+    <div class="sidebar-header">
+        <h2>메뉴</h2>
+        <button id="sidebarClose" class="sidebar-close">&times;</button>
+    </div>
+    <nav class="sidebar-nav">
+        <button class="sidebar-item" id="menuProfile">
+            <span class="sidebar-icon">👤</span>
+            <span>프로필</span>
+        </button>
+        <button class="sidebar-item" id="menuStats">
+            <span class="sidebar-icon">📊</span>
+            <span>주간 통계</span>
+        </button>
+        <button class="sidebar-item" id="menuSettings">
+            <span class="sidebar-icon">⚙️</span>
+            <span>설정</span>
+        </button>
+        <button class="sidebar-item" id="sidebarLogout">
+            <span class="sidebar-icon">🚪</span>
+            <span>로그아웃</span>
+        </button>
+    </nav>
+</aside>
+
+<!-- Main Content -->
+<main class="app-main">
+    <!-- Today's Summary -->
+    <section class="summary-section">
+        <div class="summary-header">
+            <h2>오늘의 카페인</h2>
+            <div class="summary-date" id="todayDate"></div>
+        </div>
+
+        <!-- Quick Add Buttons -->
+        <section class="quick-add-section">
+            <div class="quick-buttons">
+                <button class="btn-quick" onclick="openQuickAddModal('아메리카노', 150)">
+                    <span class="quick-icon">☕</span>
+                    <span class="quick-label">아메리카노</span>
+                </button>
+                <button class="btn-quick" onclick="openQuickAddModal('카페라떼', 75)">
+                    <span class="quick-icon">🥛</span>
+                    <span class="quick-label">라떼</span>
+                </button>
+                <button class="btn-quick" onclick="openQuickAddModal('콜드브루', 200)">
+                    <span class="quick-icon">🧊</span>
+                    <span class="quick-label">콜드브루</span>
+                </button>
+                <button class="btn-quick" onclick="openQuickAddModal('에너지드링크', 100)">
+                    <span class="quick-icon">⚡</span>
+                    <span class="quick-label">에너지</span>
+                </button>
+            </div>
+        </section>
+
+        <div class="summary-content">
+            <!-- 왼쪽: 커피컵 게이지 -->
+            <div class="coffee-gauge-card">
+                <div class="coffee-cup-wrapper">
+                    <div class="coffee-cup">
+                        <!-- 스팀 애니메이션 -->
+                        <div class="steam-container">
+                            <div class="steam s1"></div>
+                            <div class="steam s2"></div>
+                            <div class="steam s3"></div>
+                        </div>
+                        <div class="cup-body">
+                            <div class="coffee-fill" id="coffeeFill">
+                                <!-- 웨이브 효과 -->
+                                <div class="coffee-wave"></div>
+                                <div class="coffee-wave wave2"></div>
+                            </div>
+                        </div>
+                        <div class="cup-handle"></div>
+                    </div>
+                    <div class="coffee-stats">
+                        <div class="coffee-current">
+                            <span class="coffee-value" id="coffeeValue">0</span>
+                            <span class="coffee-unit">mg</span>
+                        </div>
+                        <div class="coffee-percent" id="coffeePercent">0%</div>
+                        <div class="coffee-limit">일일 권장량: <span id="dailyLimit">400mg</span></div>
+                    </div>
+                </div>
+                <div id="bedtimePrediction"></div>
+            </div>
+
+            <!-- 오른쪽: 오늘 마신 기록 -->
+            <div class="today-intakes-card">
+                <div class="intakes-header">
+                    <h3>오늘 마신 기록</h3>
+                    <span class="intake-count" id="intakeCount">0회</span>
+                </div>
+                <div class="intakes-timeline" id="intakesTimeline">
+                    <!-- 섭취 기록 표시 -->
+                </div>
             </div>
         </div>
-    </header>
+    </section>
 
-    <!-- Sidebar -->
-    <div id="sidebarOverlay" class="sidebar-overlay"></div>
-    <aside id="sidebar" class="sidebar">
-        <div class="sidebar-header">
-            <h2>메뉴</h2>
-            <button id="sidebarClose" class="sidebar-close">&times;</button>
+    <!-- Chart Section: 탭으로 꺾은선/히트맵 전환 -->
+    <section class="chart-section">
+        <div class="chart-card">
+            <div class="chart-header">
+                <h3>체내 카페인 추이</h3>
+                <div class="chart-tabs">
+                    <button class="chart-tab-btn active" id="lineChartTab">📈 그래프</button>
+                    <button class="chart-tab-btn" id="heatmapTab">🟩 히트맵</button>
+                </div>
+            </div>
+
+            <!-- 꺾은선 그래프 -->
+            <div class="chart-container active" id="lineChartContainer">
+                <div class="chart-wrapper">
+                    <canvas id="caffeineChart"></canvas>
+                </div>
+                <div class="chart-legend">
+                    <span class="legend-item">
+                        <span class="legend-dot caffeine"></span>
+                        체내 카페인
+                    </span>
+                    <span class="legend-item">
+                        <span class="legend-dot target"></span>
+                        목표 수면 카페인
+                    </span>
+                    <span class="legend-item">
+                        <span class="legend-dot limit"></span>
+                        일일 한계량
+                    </span>
+                </div>
+            </div>
+
+            <!-- 히트맵 -->
+            <div class="chart-container" id="heatmapContainer">
+                <div class="heatmap-wrapper">
+                    <div class="heatmap-title">향후 12시간 카페인 변화</div>
+                    <div class="heatmap-grid" id="heatmapGrid">
+                        <!-- JS로 생성 -->
+                    </div>
+                    <div class="heatmap-legend">
+                        <div class="heatmap-legend-item">
+                            <div class="heatmap-legend-color" style="background: #EF5350;"></div>
+                            <span>높음</span>
+                        </div>
+                        <div class="heatmap-legend-item">
+                            <div class="heatmap-legend-color" style="background: #FFA726;"></div>
+                            <span>주의</span>
+                        </div>
+                        <div class="heatmap-legend-item">
+                            <div class="heatmap-legend-color" style="background: #FFEE58;"></div>
+                            <span>보통</span>
+                        </div>
+                        <div class="heatmap-legend-item">
+                            <div class="heatmap-legend-color" style="background: #66BB6A;"></div>
+                            <span>안전</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <nav class="sidebar-nav">
-            <button class="sidebar-item" id="menuProfile">
-                <span class="sidebar-icon">👤</span>
-                <span>프로필</span>
-            </button>
-            <button class="sidebar-item" id="menuStats">
-                <span class="sidebar-icon">📊</span>
-                <span>주간 통계</span>
-            </button>
-            <button class="sidebar-item" id="menuSettings">
-                <span class="sidebar-icon">⚙️</span>
-                <span>설정</span>
-            </button>
-            <button class="sidebar-item" id="sidebarLogout">
-                <span class="sidebar-icon">🚪</span>
-                <span>로그아웃</span>
-            </button>
-        </nav>
-    </aside>
+    </section>
 
-    <!-- Main Content -->
-    <main class="app-main">
-        <!-- Today's Summary -->
-        <section class="summary-section">
-            <div class="summary-header">
-                <h2>오늘의 카페인</h2>
-                <div class="summary-date" id="todayDate"></div>
+    <!-- Beverage Selection -->
+    <section class="beverage-section">
+        <div class="section-header">
+            <h2>음료 선택</h2>
+        </div>
+
+        <!-- Beverage Tabs -->
+        <div class="beverage-tabs">
+            <button class="beverage-tab-btn active" data-tab="preset">음료 검색</button>
+            <button class="beverage-tab-btn" data-tab="custom">내 음료</button>
+        </div>
+
+        <!-- Preset Beverages Tab -->
+        <div id="presetTab" class="beverage-tab-content active">
+            <div class="search-box-large">
+                <input type="text" id="beverageSearch" placeholder="음료 이름 또는 브랜드를 검색하세요... (예: 스타벅스, 아메리카노)">
+                <button id="searchBtn" class="btn-search">검색</button>
             </div>
-
-            <!-- Quick Add Buttons -->
-            <section class="quick-add-section">
-                <div class="quick-buttons">
-                    <button class="btn-quick" onclick="openQuickAddModal('아메리카노', 150)">
-                        <span class="quick-icon">☕</span>
-                        <span class="quick-label">아메리카노</span>
-                    </button>
-                    <button class="btn-quick" onclick="openQuickAddModal('카페라떼', 75)">
-                        <span class="quick-icon">🥛</span>
-                        <span class="quick-label">라떼</span>
-                    </button>
-                    <button class="btn-quick" onclick="openQuickAddModal('콜드브루', 200)">
-                        <span class="quick-icon">🧊</span>
-                        <span class="quick-label">콜드브루</span>
-                    </button>
-                    <button class="btn-quick" onclick="openQuickAddModal('에너지드링크', 100)">
-                        <span class="quick-icon">⚡</span>
-                        <span class="quick-label">에너지</span>
-                    </button>
-                </div>
-            </section>
-
-            <div class="summary-content">
-                <!-- 왼쪽: 커피컵 게이지 -->
-                <div class="coffee-gauge-card">
-                    <div class="coffee-cup-wrapper">
-                        <div class="coffee-cup">
-                            <!-- 스팀 애니메이션 -->
-                            <div class="steam-container">
-                                <div class="steam s1"></div>
-                                <div class="steam s2"></div>
-                                <div class="steam s3"></div>
-                            </div>
-                            <div class="cup-body">
-                                <div class="coffee-fill" id="coffeeFill">
-                                    <!-- 웨이브 효과 -->
-                                    <div class="coffee-wave"></div>
-                                    <div class="coffee-wave wave2"></div>
-                                </div>
-                            </div>
-                            <div class="cup-handle"></div>
-                        </div>
-                        <div class="coffee-stats">
-                            <div class="coffee-current">
-                                <span class="coffee-value" id="coffeeValue">0</span>
-                                <span class="coffee-unit">mg</span>
-                            </div>
-                            <div class="coffee-percent" id="coffeePercent">0%</div>
-                            <div class="coffee-limit">일일 권장량: <span id="dailyLimit">400mg</span></div>
-                        </div>
-                    </div>
-                    <div id="bedtimePrediction"></div>
-                </div>
-
-                <!-- 오른쪽: 오늘 마신 기록 -->
-                <div class="today-intakes-card">
-                    <div class="intakes-header">
-                        <h3>오늘 마신 기록</h3>
-                        <span class="intake-count" id="intakeCount">0회</span>
-                    </div>
-                    <div class="intakes-timeline" id="intakesTimeline">
-                        <!-- 섭취 기록 표시 -->
-                    </div>
+            <div class="beverage-grid" id="beverageGrid">
+                <div class="empty-state">
+                    <div class="empty-state-icon">🔍</div>
+                    <p>음료를 검색해보세요</p>
                 </div>
             </div>
-        </section>
+        </div>
 
-        <!-- Chart Section: 탭으로 꺾은선/히트맵 전환 -->
-        <section class="chart-section">
-            <div class="chart-card">
-                <div class="chart-header">
-                    <h3>체내 카페인 추이</h3>
-                    <div class="chart-tabs">
-                        <button class="chart-tab-btn active" id="lineChartTab">📈 그래프</button>
-                        <button class="chart-tab-btn" id="heatmapTab">🟩 히트맵</button>
-                    </div>
-                </div>
-
-                <!-- 꺾은선 그래프 -->
-                <div class="chart-container active" id="lineChartContainer">
-                    <div class="chart-wrapper">
-                        <canvas id="caffeineChart"></canvas>
-                    </div>
-                    <div class="chart-legend">
-                        <span class="legend-item">
-                            <span class="legend-dot caffeine"></span>
-                            체내 카페인
-                        </span>
-                        <span class="legend-item">
-                            <span class="legend-dot target"></span>
-                            목표 수면 카페인
-                        </span>
-                        <span class="legend-item">
-                            <span class="legend-dot limit"></span>
-                            일일 한계량
-                        </span>
-                    </div>
-                </div>
-
-                <!-- 히트맵 -->
-                <div class="chart-container" id="heatmapContainer">
-                    <div class="heatmap-wrapper">
-                        <div class="heatmap-title">향후 12시간 카페인 변화</div>
-                        <div class="heatmap-grid" id="heatmapGrid">
-                            <!-- JS로 생성 -->
-                        </div>
-                        <div class="heatmap-legend">
-                            <div class="heatmap-legend-item">
-                                <div class="heatmap-legend-color" style="background: #EF5350;"></div>
-                                <span>높음</span>
-                            </div>
-                            <div class="heatmap-legend-item">
-                                <div class="heatmap-legend-color" style="background: #FFA726;"></div>
-                                <span>주의</span>
-                            </div>
-                            <div class="heatmap-legend-item">
-                                <div class="heatmap-legend-color" style="background: #FFEE58;"></div>
-                                <span>보통</span>
-                            </div>
-                            <div class="heatmap-legend-item">
-                                <div class="heatmap-legend-color" style="background: #66BB6A;"></div>
-                                <span>안전</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+        <!-- Custom Beverages Tab -->
+        <div id="customTab" class="beverage-tab-content">
+            <div class="custom-header">
+                <button id="addCustomBtn" class="btn-primary">+ 나만의 음료 추가</button>
             </div>
-        </section>
-
-        <!-- Beverage Selection -->
-        <section class="beverage-section">
-            <div class="section-header">
-                <h2>음료 선택</h2>
+            <div class="beverage-grid" id="customBeverageGrid">
             </div>
-
-            <!-- Beverage Tabs -->
-            <div class="beverage-tabs">
-                <button class="beverage-tab-btn active" data-tab="preset">음료 검색</button>
-                <button class="beverage-tab-btn" data-tab="custom">내 음료</button>
-            </div>
-
-            <!-- Preset Beverages Tab -->
-            <div id="presetTab" class="beverage-tab-content active">
-                <div class="search-box-large">
-                    <input type="text" id="beverageSearch" placeholder="음료 이름 또는 브랜드를 검색하세요... (예: 스타벅스, 아메리카노)">
-                    <button id="searchBtn" class="btn-search">검색</button>
-                </div>
-                <div class="beverage-grid" id="beverageGrid">
-                    <div class="empty-state">
-                        <div class="empty-state-icon">🔍</div>
-                        <p>음료를 검색해보세요</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Custom Beverages Tab -->
-            <div id="customTab" class="beverage-tab-content">
-                <div class="custom-header">
-                    <button id="addCustomBtn" class="btn-primary">+ 나만의 음료 추가</button>
-                </div>
-                <div class="beverage-grid" id="customBeverageGrid">
-                </div>
-            </div>
-        </section>
-    </main>
-</div>
+        </div>
+    </section>
+</main>
 
 <!-- Weekly Stats Modal -->
 <div id="weeklyStatsModal" class="modal">
@@ -388,7 +341,85 @@
 </div>
 
 <script src="/js/api.js"></script>
-<script src="/js/auth.js"></script>
 <script src="/js/app.js"></script>
+<script>
+    // 페이지 로드 시 세션 체크
+    window.addEventListener('DOMContentLoaded', async () => {
+        try {
+            const user = await AuthAPI.me();
+            sessionStorage.setItem('user', JSON.stringify(user));
+            document.getElementById('userName').textContent = user.name;
+            initApp();
+        } catch (error) {
+            // 세션 없음 → 로그인 페이지로 이동
+            sessionStorage.removeItem('user');
+            window.location.href = '/login.html';
+        }
+    });
+
+    // 사이드바 설정
+    function setupSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+        const menuBtn = document.getElementById('menuBtn');
+        const sidebarClose = document.getElementById('sidebarClose');
+        const sidebarLogout = document.getElementById('sidebarLogout');
+
+        function openSidebar() {
+            sidebar.classList.add('active');
+            sidebarOverlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeSidebar() {
+            sidebar.classList.remove('active');
+            sidebarOverlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        menuBtn?.addEventListener('click', openSidebar);
+        sidebarClose?.addEventListener('click', closeSidebar);
+        sidebarOverlay?.addEventListener('click', closeSidebar);
+
+        // 로그아웃
+        sidebarLogout?.addEventListener('click', async (e) => {
+            e.preventDefault();
+            stopPolling();
+
+            try {
+                await AuthAPI.logout();
+            } catch (error) {
+                console.log('로그아웃 API:', error.message);
+            }
+
+            sessionStorage.removeItem('user');
+            window.location.href = '/login.html';
+        });
+
+        // 주간 통계 메뉴
+        document.getElementById('menuStats')?.addEventListener('click', async (e) => {
+            e.preventDefault();
+            closeSidebar();
+            await openWeeklyStatsModal();
+        });
+
+        // 프로필 메뉴
+        document.getElementById('menuProfile')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            closeSidebar();
+            alert('프로필 기능은 준비 중입니다.');
+        });
+
+        // 설정 메뉴
+        document.getElementById('menuSettings')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            closeSidebar();
+            alert('설정 기능은 준비 중입니다.');
+        });
+    }
+
+    // 사이드바 설정 실행
+    setupSidebar();
+</script>
 </body>
 </html>

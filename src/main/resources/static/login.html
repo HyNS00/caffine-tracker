@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CaFit - 로그인</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Cormorant+Garamond:wght@600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<div class="login-container">
+    <div class="login-hero">
+        <h1 class="brand-title">CaFit</h1>
+        <p class="brand-subtitle">내게 <span class="fit-highlight">fit</span> 한 카페인 관리</p>
+    </div>
+
+    <div class="login-forms">
+        <h2 class="form-title">로그인</h2>
+
+        <form id="loginForm" class="auth-form active">
+            <div class="form-group">
+                <input type="email" id="loginEmail" placeholder="이메일" required>
+            </div>
+            <div class="form-group">
+                <input type="password" id="loginPassword" placeholder="비밀번호" required>
+            </div>
+            <button type="submit" class="btn-primary">로그인</button>
+            <div id="loginError" class="error-message"></div>
+        </form>
+
+        <div class="auth-link">
+            <span>계정이 없으신가요?</span>
+            <a href="/signup.html">회원가입</a>
+        </div>
+    </div>
+</div>
+
+<script src="/js/api.js"></script>
+<script>
+    // 이미 로그인된 상태면 앱으로 이동
+    window.addEventListener('DOMContentLoaded', async () => {
+        try {
+            const user = await AuthAPI.me();
+            sessionStorage.setItem('user', JSON.stringify(user));
+            window.location.href = '/';
+        } catch (error) {
+            // 로그인 안 됨 - 현재 페이지 유지
+            sessionStorage.removeItem('user');
+        }
+    });
+
+    // 로그인 폼 제출
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const email = document.getElementById('loginEmail').value;
+        const password = document.getElementById('loginPassword').value;
+        const errorEl = document.getElementById('loginError');
+
+        try {
+            const response = await AuthAPI.login({ email, password });
+            sessionStorage.setItem('user', JSON.stringify(response));
+            window.location.href = '/';
+        } catch (error) {
+            errorEl.textContent = error.message;
+            errorEl.classList.add('show');
+
+            setTimeout(() => {
+                errorEl.classList.remove('show');
+            }, 3000);
+        }
+    });
+</script>
+</body>
+</html>

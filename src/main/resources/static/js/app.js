@@ -25,7 +25,6 @@ async function initApp() {
     setupSearchListener();
     setupCustomBeverageListeners();
     setupModalListeners();
-    setupSidebar();
     setupChartTabs();
     setupVisibilityChange();
     startPolling();
@@ -72,72 +71,6 @@ function updateTodayDate() {
     const today = new Date();
     const options = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' };
     document.getElementById('todayDate').textContent = today.toLocaleDateString('ko-KR', options);
-}
-
-// ========================================
-// 사이드바 설정
-// ========================================
-function setupSidebar() {
-    const sidebar = document.getElementById('sidebar');
-    const sidebarOverlay = document.getElementById('sidebarOverlay');
-    const menuBtn = document.getElementById('menuBtn');
-    const sidebarClose = document.getElementById('sidebarClose');
-    const sidebarLogout = document.getElementById('sidebarLogout');
-
-    function openSidebar() {
-        sidebar.classList.add('active');
-        sidebarOverlay.classList.add('active');
-        document.body.style.overflow = 'hidden';
-    }
-
-    function closeSidebar() {
-        sidebar.classList.remove('active');
-        sidebarOverlay.classList.remove('active');
-        document.body.style.overflow = '';
-    }
-
-    menuBtn?.addEventListener('click', openSidebar);
-    sidebarClose?.addEventListener('click', closeSidebar);
-    sidebarOverlay?.addEventListener('click', closeSidebar);
-
-    // 사이드바 로그아웃
-    sidebarLogout?.addEventListener('click', async (e) => {
-        e.preventDefault();
-        stopPolling(); // 폴링 중지
-
-        // API 호출 시도 (실패해도 무시)
-        try {
-            await AuthAPI.logout();
-        } catch (error) {
-            console.log('로그아웃 API:', error.message);
-        }
-
-        // 무조건 로그아웃 처리
-        sessionStorage.removeItem('user');
-        closeSidebar();
-        showLoginScreen();
-    });
-
-    // 주간 통계 메뉴
-    document.getElementById('menuStats')?.addEventListener('click', async (e) => {
-        e.preventDefault();
-        closeSidebar();
-        await openWeeklyStatsModal();
-    });
-
-    // 프로필 메뉴
-    document.getElementById('menuProfile')?.addEventListener('click', (e) => {
-        e.preventDefault();
-        closeSidebar();
-        alert('프로필 기능은 준비 중입니다.');
-    });
-
-    // 설정 메뉴
-    document.getElementById('menuSettings')?.addEventListener('click', (e) => {
-        e.preventDefault();
-        closeSidebar();
-        alert('설정 기능은 준비 중입니다.');
-    });
 }
 
 // ========================================
