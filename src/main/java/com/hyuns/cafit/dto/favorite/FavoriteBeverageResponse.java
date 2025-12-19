@@ -1,12 +1,13 @@
 package com.hyuns.cafit.dto.favorite;
 
+import com.hyuns.cafit.domain.beverage.BeverageType;
 import com.hyuns.cafit.domain.beverage.CustomBeverage;
 import com.hyuns.cafit.domain.beverage.PresetBeverage;
 import com.hyuns.cafit.domain.favorite.FavoriteBeverage;
 
 public record FavoriteBeverageResponse(
         Long id,
-        String type,
+        BeverageType type,
         Long beverageId,
         String name,
         String brandName,
@@ -18,7 +19,7 @@ public record FavoriteBeverageResponse(
     public static FavoriteBeverageResponse fromPreset(FavoriteBeverage favorite, PresetBeverage beverage) {
         return new FavoriteBeverageResponse(
                 favorite.getId(),
-                "PRESET",
+                BeverageType.PRESET,
                 beverage.getId(),
                 beverage.getName(),
                 beverage.getBrandName(),
@@ -32,7 +33,7 @@ public record FavoriteBeverageResponse(
     public static FavoriteBeverageResponse fromCustom(FavoriteBeverage favorite, CustomBeverage beverage) {
         return new FavoriteBeverageResponse(
                 favorite.getId(),
-                "CUSTOM",
+                BeverageType.CUSTOM,
                 beverage.getId(),
                 beverage.getName(),
                 null,
