@@ -31,8 +31,8 @@ public class CaffeineCheckService {
     private final Clock clock;
     private final CaffeineDecayCalculator decayCalculator;
     private final CaffeineIntakeRepository intakeRepository;
-    private final PresetBeverageRepository presetBeverageRepository;
-    private final CustomBeverageRepository customBeverageRepository;
+    private final PresetBeverageService presetBeverageService;
+    private final CustomBeverageService customBeverageService;
 
 
     public CurrentCaffeineResponse getCurrentStatus(User user) {
@@ -49,16 +49,12 @@ public class CaffeineCheckService {
 
 
     public DrinkCheckResponse checkPresetBeverage(User user, Long beverageId) {
-        PresetBeverage beverage = presetBeverageRepository.findById(beverageId)
-                .orElseThrow(() -> new EntityNotFoundException(ErrorMessage.BEVERAGE_NOT_FOUND));
-
+        PresetBeverage beverage = presetBeverageService.getById(beverageId);
         return buildDrinkCheckResponse(user, BeverageInfo.from(beverage));
     }
 
     public DrinkCheckResponse checkCustomBeverage(User user, Long beverageId) {
-        CustomBeverage beverage = customBeverageRepository.findById(beverageId)
-                .orElseThrow(() -> new EntityNotFoundException(ErrorMessage.CUSTOM_BEVERAGE_NOT_FOUND));
-
+        CustomBeverage beverage = customBeverageService.getById(beverageId);
         return buildDrinkCheckResponse(user, BeverageInfo.from(beverage));
     }
 
