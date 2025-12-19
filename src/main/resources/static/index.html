@@ -58,25 +58,14 @@
             <div class="summary-date" id="todayDate"></div>
         </div>
 
-        <!-- Quick Add Buttons -->
-        <section class="quick-add-section">
-            <div class="quick-buttons">
-                <button class="btn-quick" onclick="openQuickAddModal('아메리카노', 150)">
-                    <span class="quick-icon">☕</span>
-                    <span class="quick-label">아메리카노</span>
-                </button>
-                <button class="btn-quick" onclick="openQuickAddModal('카페라떼', 75)">
-                    <span class="quick-icon">🥛</span>
-                    <span class="quick-label">라떼</span>
-                </button>
-                <button class="btn-quick" onclick="openQuickAddModal('콜드브루', 200)">
-                    <span class="quick-icon">🧊</span>
-                    <span class="quick-label">콜드브루</span>
-                </button>
-                <button class="btn-quick" onclick="openQuickAddModal('에너지드링크', 100)">
-                    <span class="quick-icon">⚡</span>
-                    <span class="quick-label">에너지</span>
-                </button>
+        <!-- 즐겨찾기 섹션 (Quick Add 대체) -->
+        <section class="favorites-section">
+            <div class="favorites-header">
+                <h3>⭐ 즐겨찾기</h3>
+                <span class="favorites-count" id="favoritesCount"></span>
+            </div>
+            <div id="favoritesContainer">
+                <!-- JS로 렌더링 -->
             </div>
         </section>
 
@@ -255,30 +244,10 @@
                 <input type="datetime-local" id="consumedAtInput">
             </div>
         </div>
-        <div class="modal-footer">
+        <div class="modal-footer modal-footer-three">
             <button class="btn-secondary modal-close">취소</button>
+            <button id="toggleFavoriteFromIntake" class="btn-favorite">☆ 즐겨찾기</button>
             <button id="confirmIntakeBtn" class="btn-primary">기록하기</button>
-        </div>
-    </div>
-</div>
-
-<!-- Quick Add Modal -->
-<div id="quickAddModal" class="modal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h3>☕ 빠른 기록</h3>
-            <button class="modal-close">&times;</button>
-        </div>
-        <div class="modal-body">
-            <div class="selected-beverage" id="quickAddBeverageInfo"></div>
-            <div class="form-group">
-                <label>섭취 시간</label>
-                <input type="datetime-local" id="quickConsumedAtInput">
-            </div>
-        </div>
-        <div class="modal-footer">
-            <button class="btn-secondary modal-close">취소</button>
-            <button id="confirmQuickAddBtn" class="btn-primary">기록하기</button>
         </div>
     </div>
 </div>
@@ -333,15 +302,23 @@
                 <!-- JS로 채워짐 -->
             </div>
         </div>
-        <div class="modal-footer">
+        <div class="modal-footer modal-footer-three">
             <button class="btn-secondary modal-close">닫기</button>
+            <button id="addFavoriteFromDetail" class="btn-favorite">⭐ 즐겨찾기</button>
             <button id="deleteIntakeFromDetail" class="btn-danger">삭제</button>
         </div>
     </div>
 </div>
 
+<!-- JS 모듈 로드 순서 중요! -->
 <script src="/js/api.js"></script>
 <script src="/js/app.js"></script>
+<script src="/js/caffeine.js"></script>
+<script src="/js/beverage.js"></script>
+<script src="/js/intake.js"></script>
+<script src="/js/favorite.js"></script>
+<script src="/js/statistics.js"></script>
+
 <script>
     // 페이지 로드 시 세션 체크
     window.addEventListener('DOMContentLoaded', async () => {
