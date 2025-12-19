@@ -1,6 +1,7 @@
 package com.hyuns.cafit.domain.intake;
 
 import com.hyuns.cafit.domain.beverage.BeverageCategory;
+import com.hyuns.cafit.domain.beverage.BeverageType;
 import com.hyuns.cafit.domain.beverage.CustomBeverage;
 import com.hyuns.cafit.domain.beverage.PresetBeverage;
 import com.hyuns.cafit.domain.user.User;
@@ -43,6 +44,13 @@ public class CaffeineIntake {
     @Column(nullable = false, name = "consumed_at")
     private LocalDateTime consumedAt;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "source_type", length = 10)
+    private BeverageType sourceType;
+
+    @Column(name = "source_beverage_id")
+    private Long sourceBeverageId;
+
     private CaffeineIntake(
             User user,
             String beverageName,
@@ -50,7 +58,10 @@ public class CaffeineIntake {
             BeverageCategory category,
             int volumeMl,
             double caffeineMg,
-            LocalDateTime consumedAt) {
+            LocalDateTime consumedAt,
+            BeverageType sourceType,
+            Long sourceBeverageId
+    ) {
         this.user = user;
         this.beverageName = beverageName;
         this.brandName = brandName;
@@ -58,6 +69,8 @@ public class CaffeineIntake {
         this.volumeMl = volumeMl;
         this.caffeineMg = caffeineMg;
         this.consumedAt = consumedAt;
+        this.sourceType = sourceType;
+        this.sourceBeverageId = sourceBeverageId;
     }
 
     public static CaffeineIntake fromPreset(User user, PresetBeverage beverage, LocalDateTime consumedAt) {
@@ -68,7 +81,9 @@ public class CaffeineIntake {
                 beverage.getCategory(),
                 beverage.getVolumeMl(),
                 beverage.getCaffeineMg(),
-                consumedAt
+                consumedAt,
+                BeverageType.PRESET,
+                beverage.getId()
         );
     }
 
@@ -80,7 +95,9 @@ public class CaffeineIntake {
                 beverage.getCategory(),
                 beverage.getVolumeMl(),
                 beverage.getCaffeineMg(),
-                consumedAt
+                consumedAt,
+                BeverageType.CUSTOM,
+                beverage.getId()
         );
     }
 
