@@ -44,7 +44,7 @@ public class FavoriteBeverage {
 
 
     // Preset용 생성
-    public static FavoriteBeverage ofPreset(
+    public static FavoriteBeverage fromPreset(
             User user,
             PresetBeverage beverage,
             int order,
@@ -58,7 +58,7 @@ public class FavoriteBeverage {
         return favorite;
     }
     // 커스텀용
-    public static FavoriteBeverage ofCustom(
+    public static FavoriteBeverage fromCustom(
             User user,
             CustomBeverage beverage,
             int order,
