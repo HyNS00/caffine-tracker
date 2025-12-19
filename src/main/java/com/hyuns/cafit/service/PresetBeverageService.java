@@ -1,9 +1,12 @@
 package com.hyuns.cafit.service;
 
 import com.hyuns.cafit.domain.beverage.BeverageCategory;
+import com.hyuns.cafit.domain.beverage.PresetBeverage;
 import com.hyuns.cafit.domain.beverage.PresetBeverageRepository;
 import com.hyuns.cafit.dto.beverage.BeverageCategoryResponse;
 import com.hyuns.cafit.dto.beverage.PresetBeverageResponse;
+import com.hyuns.cafit.errors.EntityNotFoundException;
+import com.hyuns.cafit.errors.ErrorMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,5 +38,10 @@ public class PresetBeverageService {
         return Arrays.stream(BeverageCategory.values())
                 .map(BeverageCategoryResponse::from)
                 .toList();
+    }
+
+    public PresetBeverage getById(Long id) {
+        return presetBeverageRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(ErrorMessage.BEVERAGE_NOT_FOUND));
     }
 }
