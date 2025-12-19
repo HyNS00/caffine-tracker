@@ -126,9 +126,14 @@ function renderFavorites() {
                                 <span class="favorite-name">${fav.name}</span>
                                 <span class="favorite-caffeine">${Math.round(fav.caffeineMg)}mg</span>
                             </div>
-                            <button class="favorite-drink-btn" onclick="drinkFavorite(${fav.id})">
-                                마시기
-                            </button>
+                            <div class="favorite-buttons">
+                                <button class="favorite-drink-btn" onclick="drinkFavorite(${fav.id})" title="상세 확인 후 기록">
+                                    🔍 확인
+                                </button>
+                                <button class="favorite-quick-btn" onclick="quickDrinkFavorite(${fav.id})" title="즉시 섭취 기록">
+                                    🚀 즉시
+                                </button>
+                            </div>
                         </div>
                     `;
         })
@@ -226,6 +231,38 @@ async function drinkFavorite(favoriteId) {
     const beverageId = favorite.beverageId;
 
     await onBeverageClick(beverageId, type);
+}
+
+// 즐겨찾기에서 즉시 섭취 (퀵 버튼)
+async function quickDrinkFavorite(favoriteId) {
+    const favorite = AppState.favorites.find(f => f.id === favoriteId);
+    if (!favorite) return;
+
+    const type = String(favorite.type || '').toLowerCase();
+    const beverageId = favorite.beverageId;
+
+    // 현재 시간으로 바로 섭취 기록
+    const now = new Date();
+    const isoDateTime = new Date(now.getTime() - now.getTimezoneOffset() * 60000)
+        .toISOString()
+        .slice(0, 19);
+
+    try {
+        if (type === 'preset') {
+            await IntakeAPI.recordPreset(beverageId, isoDateTime);
+        } else {
+            await IntakeAPI.recordCustom(beverageId, isoDateTime);
+        }
+
+        // 즉시 갱신
+        await loadTodayIntakes();
+        await loadCaffeineStatus();
+        await loadTimeline();
+
+        showToast(`🚀 ${favorite.name} ${Math.round(favorite.caffeineMg)}mg 즉시 기록!`);
+    } catch (error) {
+        showToast('섭취 기록 실패: ' + error.message);
+    }
 }
 
 // ========================================
@@ -596,22 +633,47 @@ favoriteStyle.textContent = `
         font-weight: 600;
     }
 
-    .favorite-drink-btn {
+    .favorite-buttons {
+        display: flex;
+        gap: 0.5rem;
         width: 100%;
+    }
+
+    .favorite-drink-btn {
+        flex: 1;
         background: transparent;
-        border: 1px solid var(--primary);
-        color: var(--primary);
+        border: 1px solid var(--border);
+        color: var(--text-secondary);
         padding: 0.5rem;
         border-radius: 8px;
-        font-size: 0.85rem;
+        font-size: 0.75rem;
         font-weight: 600;
         cursor: pointer;
         transition: all 0.2s;
     }
 
     .favorite-drink-btn:hover {
+        border-color: var(--primary);
+        color: var(--primary);
+    }
+
+    .favorite-quick-btn {
+        flex: 1;
         background: var(--primary);
+        border: 1px solid var(--primary);
         color: var(--bg-main);
+        padding: 0.5rem;
+        border-radius: 8px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .favorite-quick-btn:hover {
+        background: var(--primary-dark);
+        border-color: var(--primary-dark);
+        transform: scale(1.02);
     }
 
     /* 음료 카드 즐겨찾기 버튼 */
