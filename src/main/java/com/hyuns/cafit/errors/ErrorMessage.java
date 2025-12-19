@@ -35,7 +35,13 @@ public enum ErrorMessage {
     VALIDATION_FAILED("VALIDATION_FAILED", "입력값 검증 실패", HttpStatus.BAD_REQUEST),
 
     // System Error
-    INTERNAL_SERVER_ERROR("INTERNAL_SERVER_ERROR", "서버 내부 오류가 발생했습니다", HttpStatus.INTERNAL_SERVER_ERROR);
+    INTERNAL_SERVER_ERROR("INTERNAL_SERVER_ERROR", "서버 내부 오류가 발생했습니다", HttpStatus.INTERNAL_SERVER_ERROR),
+
+    // Favorite Beverage
+    FAVORITE_NOT_FOUND("FAVORITE_NOT_FOUND", "즐겨찾기를 찾을 수 없습니다", HttpStatus.NOT_FOUND),
+    DUPLICATE_FAVORITE("DUPLICATE_FAVORITE", "이미 즐겨찾기에 추가된 음료입니다", HttpStatus.CONFLICT),
+    UNAUTHORIZED_FAVORITE_ACCESS("UNAUTHORIZED_FAVORITE_ACCESS", "해당 즐겨찾기에 대한 권한이 없습니다", HttpStatus.FORBIDDEN);
+
 
     private final String code;
     private final String message;
