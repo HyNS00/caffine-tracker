@@ -13,9 +13,9 @@ import java.util.Optional;
 public interface FavoriteBeverageRepository extends CrudRepository<FavoriteBeverage, Long> {
     List<FavoriteBeverage> findByUserOrderByDisplayOrderAsc(User user);
 
-    Optional<FavoriteBeverage> findByUserAndPresetBeverage(User user, PresetBeverage presetBeverage);
+    boolean existsByUserAndPresetBeverage(User user, PresetBeverage presetBeverage);
 
-    Optional<FavoriteBeverage> findByUserAndCustomBeverage(User user, CustomBeverage presetBeverage);
+    boolean existsByUserAndCustomBeverage(User user, CustomBeverage customBeverage);
 
     @Query("SELECT COALESCE(MAX(f.displayOrder),0) FROM FavoriteBeverage f WHERE f.user = :user")
     int findMaxOrderByUser(@Param("user") User user);
