@@ -68,7 +68,7 @@ INSERT INTO preset_beverages (name, brand_name, category, volume_ml, caffeine_mg
                                                                                       ('에스프레소', '메가커피', 'ESPRESSO', 59, 104.8),
                                                                                       ('할메가미숫커피', '메가커피', 'LATTE', 591, 172.9),
                                                                                       ('콜드브루', '메가커피', 'COLD_BREW', 591, 156.4),
-                                                                                      ('콜드브루 라떼','메가커피','LATTE',591,131.7),
+                                                                                      ('콜드브루 라떼','메가커피','COLD_BREW',591,131.7),
                                                                                       ('카푸치노', '메가커피', 'CAPPUCCINO', 591, 190.0),
                                                                                       ('큐브라떼', '메가커피', 'LATTE', 591, 313.4),
                                                                                       ('돌체 라떼', '메가커피', 'LATTE', 591, 165.9);
