@@ -35,6 +35,8 @@ jobs:
 
     - name: Build with Gradle
       run: ./gradlew build
+      env:
+        SPRING_PROFILES_ACTIVE: ci
 
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
