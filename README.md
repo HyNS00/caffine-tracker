@@ -1,5 +1,7 @@
 # Cafit
 
+![CI](https://github.com/HyNS00/caffine-tracker/actions/workflows/ci.yml/badge.svg)
+
 나에게 맞춤형 카페인 트래커
 ---
 
