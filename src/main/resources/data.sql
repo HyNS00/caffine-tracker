@@ -149,10 +149,10 @@ INSERT INTO preset_beverages (name, brand_name, category, volume_ml, caffeine_mg
 INSERT INTO preset_beverages (name, brand_name, category, volume_ml, caffeine_mg) VALUES
                                                                                       ('원조커피', '빽다방', 'AMERICANO', 473, 237.0),
                                                                                       ('원조커피', '빽다방', 'AMERICANO', 710, 237.0),
-                                                                                      ('앗메리카노', '빽다방', 'AMERICANO', 473, 237.0),
+                                                                                      ('아메리카노', '빽다방', 'AMERICANO', 473, 293.0),
                                                                                       ('카페라떼', '빽다방', 'LATTE', 473, 237.0),
                                                                                       ('아이스 카페라떼', '빽다방', 'LATTE', 710, 237.0),
-                                                                                      ('에스프레소', '빽다방', 'ESPRESSO', 60, 237.0),
+                                                                                      ('더블 에스프레소', '빽다방', 'ESPRESSO', 60, 293.0),
                                                                                       ('콜드브루', '빽다방', 'COLD_BREW', 710, 209.0),
                                                                                       ('바닐라 라떼', '빽다방', 'LATTE', 473, 237.0);
 
