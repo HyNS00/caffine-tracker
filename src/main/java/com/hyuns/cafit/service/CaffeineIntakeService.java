@@ -9,9 +9,11 @@ import com.hyuns.cafit.domain.intake.CaffeineIntakeRepository;
 import com.hyuns.cafit.domain.user.User;
 import com.hyuns.cafit.dto.intake.CaffeineIntakeCreateRequest;
 import com.hyuns.cafit.dto.intake.CaffeineIntakeResponse;
-import com.hyuns.cafit.errors.EntityNotFoundException;
-import com.hyuns.cafit.errors.ErrorMessage;
-import com.hyuns.cafit.errors.ForbiddenException;
+import com.hyuns.cafit.errors.BeverageAccessDeniedException;
+import com.hyuns.cafit.errors.BeverageNotFoundException;
+import com.hyuns.cafit.errors.CustomBeverageNotFoundException;
+import com.hyuns.cafit.errors.IntakeAccessDeniedException;
+import com.hyuns.cafit.errors.IntakeNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,7 +39,7 @@ public class CaffeineIntakeService {
             CaffeineIntakeCreateRequest request
     ) {
         PresetBeverage beverage = presetBeverageRepository.findById(beverageId)
-                .orElseThrow(() -> new EntityNotFoundException(ErrorMessage.BEVERAGE_NOT_FOUND));
+                .orElseThrow(BeverageNotFoundException::new);
 
         CaffeineIntake intake = CaffeineIntake.fromPreset(user, beverage, request.consumedAt());
         CaffeineIntake saved = intakeRepository.save(intake);
@@ -52,10 +54,10 @@ public class CaffeineIntakeService {
             CaffeineIntakeCreateRequest request
     ) {
         CustomBeverage beverage = customBeverageRepository.findById(beverageId)
-                .orElseThrow(() -> new EntityNotFoundException(ErrorMessage.CUSTOM_BEVERAGE_NOT_FOUND));
+                .orElseThrow(CustomBeverageNotFoundException::new);
 
         if (!beverage.isOwnedBy(user)) {
-            throw new ForbiddenException(ErrorMessage.UNAUTHORIZED_BEVERAGE_ACCESS);
+            throw new BeverageAccessDeniedException();
         }
 
         CaffeineIntake intake = CaffeineIntake.fromCustom(user, beverage, request.consumedAt());
@@ -82,10 +84,10 @@ public class CaffeineIntakeService {
     @Transactional
     public void deleteIntake(Long intakeId, User user) {
         CaffeineIntake intake = intakeRepository.findById(intakeId)
-                .orElseThrow(() -> new EntityNotFoundException(ErrorMessage.INTAKE_NOT_FOUND));
+                .orElseThrow(IntakeNotFoundException::new);
 
         if (!intake.isOwnedBy(user)) {
-            throw new ForbiddenException(ErrorMessage.UNAUTHORIZED_INTAKE_ACCESS);
+            throw new IntakeAccessDeniedException();
         }
 
         intakeRepository.delete(intake);

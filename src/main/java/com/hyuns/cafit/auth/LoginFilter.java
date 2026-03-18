@@ -1,8 +1,8 @@
 package com.hyuns.cafit.auth;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.hyuns.cafit.dto.ErrorResponse;
-import com.hyuns.cafit.errors.ErrorMessage;
+import com.hyuns.cafit.global.exception.dto.response.AuthErrorCode;
+import com.hyuns.cafit.global.exception.dto.response.ExceptionResponse;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -43,20 +43,18 @@ public class LoginFilter implements Filter {
         }
 
         if (session == null || session.getAttribute("userId") == null) {
-            sendErrorResponse(httpResponse, ErrorMessage.UNAUTHORIZED);
+            sendErrorResponse(httpResponse);
             return;
         }
 
         filterChain.doFilter(httpRequest, httpResponse);
     }
 
-    private void sendErrorResponse(HttpServletResponse response, ErrorMessage errorMessage) throws IOException {
-        ErrorResponse errorResponse = ErrorResponse.of(
-                errorMessage.getCode(),
-                errorMessage.getMessage()
-        );
+    private void sendErrorResponse(HttpServletResponse response) throws IOException {
+        AuthErrorCode errorCode = AuthErrorCode.UNAUTHORIZED;
+        ExceptionResponse errorResponse = ExceptionResponse.from(errorCode);
 
-        response.setStatus(errorMessage.getHttpStatus().value());
+        response.setStatus(errorCode.getHttpStatus().value());
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
         response.getWriter().write(objectMapper.writeValueAsString(errorResponse));

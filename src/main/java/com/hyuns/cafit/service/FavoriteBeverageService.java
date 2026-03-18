@@ -11,8 +11,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Clock;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -20,7 +18,6 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class FavoriteBeverageService {
-    private final Clock clock;
     private final FavoriteBeverageRepository favoriteRepository;
     private final PresetBeverageService presetBeverageService;
     private final CustomBeverageService customBeverageService;
@@ -43,10 +40,10 @@ public class FavoriteBeverageService {
     @Transactional
     public void deleteFavorite(Long favoriteId, User user) {
         FavoriteBeverage favorite = favoriteRepository.findById(favoriteId)
-                .orElseThrow(() -> new EntityNotFoundException(ErrorMessage.FAVORITE_NOT_FOUND));
+                .orElseThrow(FavoriteNotFoundException::new);
 
         if (!favorite.isOwnedBy(user)) {
-            throw new ForbiddenException(ErrorMessage.UNAUTHORIZED_FAVORITE_ACCESS);
+            throw new FavoriteAccessDeniedException();
         }
 
         favoriteRepository.delete(favorite);
@@ -59,7 +56,7 @@ public class FavoriteBeverageService {
                 .collect(Collectors.toMap(FavoriteBeverage::getId, f -> f));
 
         if (favoriteIds.size() != favoriteMap.size()) {
-            throw new BadRequestException(ErrorMessage.INVALID_FAVORITE_LIST);
+            throw new InvalidFavoriteListException();
         }
 
         for (int i = 0; i < favoriteIds.size(); i++) {
@@ -67,7 +64,7 @@ public class FavoriteBeverageService {
             FavoriteBeverage favorite = favoriteMap.get(id);
 
             if (favorite == null) {
-                throw new EntityNotFoundException(ErrorMessage.FAVORITE_NOT_FOUND);
+                throw new FavoriteNotFoundException();
             }
 
             favorite.updateOrder(i + 1);
@@ -82,8 +79,7 @@ public class FavoriteBeverageService {
         FavoriteBeverage favorite = FavoriteBeverage.fromPreset(
                 user,
                 beverage,
-                getNextOrder(user),
-                LocalDateTime.now(clock)
+                getNextOrder(user)
         );
 
         return toResponse(favoriteRepository.save(favorite));
@@ -97,8 +93,7 @@ public class FavoriteBeverageService {
         FavoriteBeverage favorite = FavoriteBeverage.fromCustom(
                 user,
                 beverage,
-                getNextOrder(user),
-                LocalDateTime.now(clock)
+                getNextOrder(user)
         );
 
         return toResponse(favoriteRepository.save(favorite));
@@ -110,13 +105,13 @@ public class FavoriteBeverageService {
 
     private void validateNotDuplicatePreset(User user, PresetBeverage beverage) {
         if (favoriteRepository.existsByUserAndPresetBeverage(user, beverage)) {
-            throw new DuplicateException(ErrorMessage.DUPLICATE_FAVORITE);
+            throw new DuplicateFavoriteException();
         }
     }
 
     private void validateNotDuplicateCustom(User user, CustomBeverage beverage) {
         if (favoriteRepository.existsByUserAndCustomBeverage(user, beverage)) {
-            throw new DuplicateException(ErrorMessage.DUPLICATE_FAVORITE);
+            throw new DuplicateFavoriteException();
         }
     }
 

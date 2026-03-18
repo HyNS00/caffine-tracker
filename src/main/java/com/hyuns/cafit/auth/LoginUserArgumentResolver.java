@@ -2,9 +2,8 @@ package com.hyuns.cafit.auth;
 
 import com.hyuns.cafit.domain.user.User;
 import com.hyuns.cafit.domain.user.UserRepository;
-import com.hyuns.cafit.errors.AuthenticationException;
-import com.hyuns.cafit.errors.EntityNotFoundException;
-import com.hyuns.cafit.errors.ErrorMessage;
+import com.hyuns.cafit.errors.UnauthorizedException;
+import com.hyuns.cafit.errors.UserNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -36,12 +35,12 @@ public class LoginUserArgumentResolver implements HandlerMethodArgumentResolver 
         HttpSession session = request.getSession(false);
 
         if (session == null) {
-            throw new AuthenticationException(ErrorMessage.UNAUTHORIZED);
+            throw new UnauthorizedException();
         }
 
         Long userId = (Long) session.getAttribute("userId");
         if (userId == null) {
-            throw new AuthenticationException(ErrorMessage.UNAUTHORIZED);
+            throw new UnauthorizedException();
         }
 
         // Long 타입 요청 시 → userId 그대로 반환 (DB 조회 없음)
@@ -51,7 +50,7 @@ public class LoginUserArgumentResolver implements HandlerMethodArgumentResolver 
 
         // User 타입 요청 시 → DB 조회
         return userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException(ErrorMessage.USER_NOT_FOUND));
+                .orElseThrow(UserNotFoundException::new);
     }
 
 }

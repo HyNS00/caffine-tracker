@@ -3,12 +3,11 @@ package com.hyuns.cafit.domain.favorite;
 import com.hyuns.cafit.domain.beverage.CustomBeverage;
 import com.hyuns.cafit.domain.beverage.PresetBeverage;
 import com.hyuns.cafit.domain.user.User;
+import com.hyuns.cafit.global.entity.CreatedAtEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "favoriate_beverages",
@@ -19,10 +18,7 @@ import java.time.LocalDateTime;
 )
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class FavoriteBeverage {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class FavoriteBeverage extends CreatedAtEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
@@ -39,36 +35,20 @@ public class FavoriteBeverage {
     @Column(nullable = false, name = "display_order")
     private int displayOrder;
 
-    @Column(nullable = false, name = "created_at")
-    private LocalDateTime createdAt;
 
-
-    // Preset용 생성
-    public static FavoriteBeverage fromPreset(
-            User user,
-            PresetBeverage beverage,
-            int order,
-            LocalDateTime now
-    ) {
+    public static FavoriteBeverage fromPreset(User user, PresetBeverage beverage, int order) {
         FavoriteBeverage favorite = new FavoriteBeverage();
         favorite.user = user;
         favorite.presetBeverage = beverage;
         favorite.displayOrder = order;
-        favorite.createdAt = now;
         return favorite;
     }
-    // 커스텀용
-    public static FavoriteBeverage fromCustom(
-            User user,
-            CustomBeverage beverage,
-            int order,
-            LocalDateTime now
-    ) {
+
+    public static FavoriteBeverage fromCustom(User user, CustomBeverage beverage, int order) {
         FavoriteBeverage favorite = new FavoriteBeverage();
         favorite.user = user;
         favorite.customBeverage = beverage;
         favorite.displayOrder = order;
-        favorite.createdAt = now;
         return favorite;
     }
 

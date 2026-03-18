@@ -6,9 +6,8 @@ import com.hyuns.cafit.domain.user.User;
 import com.hyuns.cafit.dto.beverage.CustomBeverageCreateRequest;
 import com.hyuns.cafit.dto.beverage.CustomBeverageResponse;
 import com.hyuns.cafit.dto.beverage.CustomBeverageUpdateRequest;
-import com.hyuns.cafit.errors.EntityNotFoundException;
-import com.hyuns.cafit.errors.ErrorMessage;
-import com.hyuns.cafit.errors.ForbiddenException;
+import com.hyuns.cafit.errors.BeverageAccessDeniedException;
+import com.hyuns.cafit.errors.CustomBeverageNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -77,7 +76,7 @@ public class CustomBeverageService {
     @Transactional(readOnly = true)
     public CustomBeverage getById(Long id) {
         return customBeverageRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(ErrorMessage.CUSTOM_BEVERAGE_NOT_FOUND));
+                .orElseThrow(CustomBeverageNotFoundException::new);
     }
 
     @Transactional(readOnly = true)
@@ -89,16 +88,12 @@ public class CustomBeverageService {
 
     private CustomBeverage findByIdOrThrow(Long beverageId) {
         return customBeverageRepository.findById(beverageId)
-                .orElseThrow(() -> new EntityNotFoundException(
-                        ErrorMessage.CUSTOM_BEVERAGE_NOT_FOUND)
-                );
+                .orElseThrow(CustomBeverageNotFoundException::new);
     }
 
     private void validateOwnership(CustomBeverage beverage, User user) {
         if (!beverage.isOwnedBy(user)) {
-            throw new ForbiddenException(
-                    ErrorMessage.UNAUTHORIZED_BEVERAGE_ACCESS
-            );
+            throw new BeverageAccessDeniedException();
         }
     }
 }

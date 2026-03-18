@@ -1,6 +1,7 @@
 package com.hyuns.cafit.domain.beverage;
 
 import com.hyuns.cafit.domain.user.User;
+import com.hyuns.cafit.global.entity.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -10,11 +11,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "custom_beverages")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class CustomBeverage {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
+public class CustomBeverage extends BaseTimeEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
