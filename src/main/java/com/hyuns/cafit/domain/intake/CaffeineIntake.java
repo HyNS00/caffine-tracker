@@ -5,6 +5,7 @@ import com.hyuns.cafit.domain.beverage.BeverageType;
 import com.hyuns.cafit.domain.beverage.CustomBeverage;
 import com.hyuns.cafit.domain.beverage.PresetBeverage;
 import com.hyuns.cafit.domain.user.User;
+import com.hyuns.cafit.global.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -16,10 +17,7 @@ import java.time.LocalDateTime;
 @Table(name = "caffeine_intakes")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class CaffeineIntake {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class CaffeineIntake extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)

@@ -1,5 +1,6 @@
 package com.hyuns.cafit.domain.user;
 
+import com.hyuns.cafit.global.entity.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -11,10 +12,7 @@ import java.time.LocalTime;
 @Table(name = "users")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class User {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class User extends BaseTimeEntity {
 
     @Column(nullable = false, unique = true, length = 50)
     private String email;
@@ -63,16 +61,4 @@ public class User {
         return this.password.equals(rawPassword);
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        User user = (User) o;
-        return id != null && id.equals(user.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return getClass().hashCode();
-    }
 }

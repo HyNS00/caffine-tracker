@@ -1,5 +1,6 @@
 package com.hyuns.cafit.domain.beverage;
 
+import com.hyuns.cafit.global.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -9,10 +10,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "preset_beverages")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class PresetBeverage {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class PresetBeverage extends BaseEntity {
 
     @Column(nullable = false, length = 100)
     private String name;
