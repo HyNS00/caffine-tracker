@@ -1,7 +1,7 @@
 package com.hyuns.cafit.auth;
 
 import com.hyuns.cafit.domain.user.User;
-import com.hyuns.cafit.domain.user.UserRepository;
+import com.hyuns.cafit.domain.user.repository.UserRepository;
 import com.hyuns.cafit.errors.UnauthorizedException;
 import com.hyuns.cafit.errors.UserNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;

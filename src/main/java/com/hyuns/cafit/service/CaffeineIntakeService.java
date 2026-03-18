@@ -1,11 +1,11 @@
 package com.hyuns.cafit.service;
 
 import com.hyuns.cafit.domain.beverage.CustomBeverage;
-import com.hyuns.cafit.domain.beverage.CustomBeverageRepository;
+import com.hyuns.cafit.domain.beverage.repository.CustomBeverageRepository;
 import com.hyuns.cafit.domain.beverage.PresetBeverage;
-import com.hyuns.cafit.domain.beverage.PresetBeverageRepository;
+import com.hyuns.cafit.domain.beverage.repository.PresetBeverageRepository;
 import com.hyuns.cafit.domain.intake.CaffeineIntake;
-import com.hyuns.cafit.domain.intake.CaffeineIntakeRepository;
+import com.hyuns.cafit.domain.intake.repository.CaffeineIntakeRepository;
 import com.hyuns.cafit.domain.user.User;
 import com.hyuns.cafit.dto.intake.CaffeineIntakeCreateRequest;
 import com.hyuns.cafit.dto.intake.CaffeineIntakeResponse;
@@ -72,7 +72,7 @@ public class CaffeineIntakeService {
         LocalDateTime startOfDay = today.atStartOfDay();
         LocalDateTime endOfDay = today.atTime(LocalTime.MAX);
 
-        List<CaffeineIntake> intakes = intakeRepository.findByUserAndConsumedAtBetweenOrderByConsumedAtDesc(
+        List<CaffeineIntake> intakes = intakeRepository.findByUserAndConsumedAtBetween(
                 user, startOfDay, endOfDay
         );
 

@@ -1,12 +1,11 @@
 package com.hyuns.cafit.service;
 
 import com.hyuns.cafit.domain.intake.CaffeineIntake;
-import com.hyuns.cafit.domain.intake.CaffeineIntakeRepository;
+import com.hyuns.cafit.domain.intake.repository.CaffeineIntakeRepository;
 import com.hyuns.cafit.domain.user.User;
 import com.hyuns.cafit.dto.statistics.*;
+import com.hyuns.cafit.infrastructure.intake.persistence.CaffeineIntakeQueryRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,6 +25,7 @@ public class CaffeineStatisticsService {
     private final Clock clock;
     private final CaffeineDecayCalculator decayCalculator;
     private final CaffeineIntakeRepository intakeRepository;
+    private final CaffeineIntakeQueryRepository intakeQueryRepository;
 
     public CaffeineTimelineResponse getTimeline(User user, int hours) {
         LocalDateTime now = LocalDateTime.now(clock);
@@ -63,8 +63,7 @@ public class CaffeineStatisticsService {
         LocalDateTime end = LocalDateTime.now(clock);
         LocalDateTime start = LocalDate.now(clock).minusDays(days - 1).atStartOfDay();
 
-        Pageable pageable = PageRequest.of(0, 3);
-        return intakeRepository.findTopBeverages(user, start, end, pageable);
+        return intakeQueryRepository.findTopBeverages(user, start, end, 3);
     }
 
     private LocalDateTime calculateBedtime(User user, LocalDateTime now) {
@@ -79,7 +78,7 @@ public class CaffeineStatisticsService {
 
     private List<CaffeineIntake> getRecentIntakes(User user, LocalDateTime now) {
         LocalDateTime startTime = now.minusHours(24);
-        return intakeRepository.findByUserAndConsumedAtBetweenOrderByConsumedAtDesc(user, startTime, now);
+        return intakeRepository.findByUserAndConsumedAtBetween(user, startTime, now);
     }
 
     private List<TimelineDataPoint> buildTimelineDataPoints(
@@ -116,7 +115,7 @@ public class CaffeineStatisticsService {
         LocalDateTime endOfDay = date.atTime(LocalTime.MAX);
 
         List<CaffeineIntake> intakes = intakeRepository
-                .findByUserAndConsumedAtBetweenOrderByConsumedAtDesc(user, startOfDay, endOfDay);
+                .findByUserAndConsumedAtBetween(user, startOfDay, endOfDay);
 
         double dailyTotal = intakes.stream()
                 .mapToDouble(CaffeineIntake::getCaffeineMg)

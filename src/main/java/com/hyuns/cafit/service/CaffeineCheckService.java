@@ -3,7 +3,7 @@ package com.hyuns.cafit.service;
 import com.hyuns.cafit.domain.beverage.CustomBeverage;
 import com.hyuns.cafit.domain.beverage.PresetBeverage;
 import com.hyuns.cafit.domain.intake.CaffeineIntake;
-import com.hyuns.cafit.domain.intake.CaffeineIntakeRepository;
+import com.hyuns.cafit.domain.intake.repository.CaffeineIntakeRepository;
 import com.hyuns.cafit.domain.user.User;
 import com.hyuns.cafit.dto.beverage.BeverageInfo;
 import com.hyuns.cafit.dto.caffeine.*;
@@ -107,7 +107,7 @@ public class CaffeineCheckService {
 
     private List<CaffeineIntake> getRecentIntakes(User user, LocalDateTime now) {
         LocalDateTime startTime = now.minusHours(24);
-        return intakeRepository.findByUserAndConsumedAtBetweenOrderByConsumedAtDesc(user, startTime, now);
+        return intakeRepository.findByUserAndConsumedAtBetween(user, startTime, now);
     }
 
     private double calculatePredictedAtBedtime(
@@ -146,7 +146,7 @@ public class CaffeineCheckService {
         LocalDateTime endOfDay = today.atTime(LocalTime.MAX);
 
         List<CaffeineIntake> todayIntakes = intakeRepository
-                .findByUserAndConsumedAtBetweenOrderByConsumedAtDesc(user, startOfDay, endOfDay);
+                .findByUserAndConsumedAtBetween(user, startOfDay, endOfDay);
 
         return todayIntakes.stream()
                 .mapToDouble(CaffeineIntake::getCaffeineMg)

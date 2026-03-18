@@ -2,7 +2,7 @@ package com.hyuns.cafit.service;
 
 import com.hyuns.cafit.domain.beverage.BeverageCategory;
 import com.hyuns.cafit.domain.beverage.PresetBeverage;
-import com.hyuns.cafit.domain.beverage.PresetBeverageRepository;
+import com.hyuns.cafit.domain.beverage.repository.PresetBeverageRepository;
 import com.hyuns.cafit.dto.beverage.BeverageCategoryResponse;
 import com.hyuns.cafit.dto.beverage.PresetBeverageResponse;
 import com.hyuns.cafit.errors.BeverageNotFoundException;
@@ -27,7 +27,7 @@ public class PresetBeverageService {
     }
 
     public List<PresetBeverageResponse> searchBeverages(String keyword) {
-        return presetBeverageRepository.searchPresetBeverageByKeyword(keyword)
+        return presetBeverageRepository.searchByKeyword(keyword)
                 .stream()
                 .map(PresetBeverageResponse::from)
                 .toList();

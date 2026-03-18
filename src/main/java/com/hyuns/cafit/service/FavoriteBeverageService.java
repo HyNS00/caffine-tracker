@@ -2,7 +2,7 @@ package com.hyuns.cafit.service;
 
 import com.hyuns.cafit.domain.beverage.*;
 import com.hyuns.cafit.domain.favorite.FavoriteBeverage;
-import com.hyuns.cafit.domain.favorite.FavoriteBeverageRepository;
+import com.hyuns.cafit.domain.favorite.repository.FavoriteBeverageRepository;
 import com.hyuns.cafit.domain.user.User;
 import com.hyuns.cafit.dto.favorite.FavoriteBeverageResponse;
 import com.hyuns.cafit.dto.favorite.FavoriteCreateRequest;

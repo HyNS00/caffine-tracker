@@ -1,7 +1,7 @@
 package com.hyuns.cafit.service;
 
 import com.hyuns.cafit.domain.beverage.CustomBeverage;
-import com.hyuns.cafit.domain.beverage.CustomBeverageRepository;
+import com.hyuns.cafit.domain.beverage.repository.CustomBeverageRepository;
 import com.hyuns.cafit.domain.user.User;
 import com.hyuns.cafit.dto.beverage.CustomBeverageCreateRequest;
 import com.hyuns.cafit.dto.beverage.CustomBeverageResponse;

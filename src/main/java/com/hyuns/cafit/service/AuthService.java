@@ -1,7 +1,7 @@
 package com.hyuns.cafit.service;
 
 import com.hyuns.cafit.domain.user.User;
-import com.hyuns.cafit.domain.user.UserRepository;
+import com.hyuns.cafit.domain.user.repository.UserRepository;
 import com.hyuns.cafit.dto.auth.AuthResponse;
 import com.hyuns.cafit.dto.auth.LoginRequest;
 import com.hyuns.cafit.dto.auth.SignUpRequest;
