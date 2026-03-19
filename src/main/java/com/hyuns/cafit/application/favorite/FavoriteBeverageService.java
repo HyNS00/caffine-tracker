@@ -1,13 +1,11 @@
 package com.hyuns.cafit.application.favorite;
 
-import com.hyuns.cafit.application.beverage.CustomBeverageService;
-import com.hyuns.cafit.application.beverage.PresetBeverageService;
-import com.hyuns.cafit.domain.beverage.*;
+import com.hyuns.cafit.domain.beverage.CustomBeverage;
+import com.hyuns.cafit.domain.beverage.PresetBeverage;
 import com.hyuns.cafit.domain.favorite.FavoriteBeverage;
 import com.hyuns.cafit.domain.favorite.repository.FavoriteBeverageRepository;
 import com.hyuns.cafit.domain.user.User;
 import com.hyuns.cafit.dto.favorite.FavoriteBeverageResponse;
-import com.hyuns.cafit.dto.favorite.FavoriteCreateRequest;
 import com.hyuns.cafit.global.exception.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,17 +18,8 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class FavoriteBeverageService {
-    private final FavoriteBeverageRepository favoriteRepository;
-    private final PresetBeverageService presetBeverageService;
-    private final CustomBeverageService customBeverageService;
 
-    @Transactional
-    public FavoriteBeverageResponse addFavorite(User user, FavoriteCreateRequest request) {
-        if (request.type() == BeverageType.PRESET) {
-            return addPresetFavorite(user, request.beverageId());
-        }
-        return addCustomFavorite(user, request.beverageId());
-    }
+    private final FavoriteBeverageRepository favoriteRepository;
 
     @Transactional(readOnly = true)
     public List<FavoriteBeverageResponse> getFavorites(User user) {
@@ -73,9 +62,8 @@ public class FavoriteBeverageService {
         }
     }
 
-    private FavoriteBeverageResponse addPresetFavorite(User user, Long beverageId) {
-        PresetBeverage beverage = presetBeverageService.getById(beverageId);
-
+    @Transactional
+    public FavoriteBeverageResponse addPresetFavorite(User user, PresetBeverage beverage) {
         validateNotDuplicatePreset(user, beverage);
 
         FavoriteBeverage favorite = FavoriteBeverage.fromPreset(
@@ -87,9 +75,8 @@ public class FavoriteBeverageService {
         return toResponse(favoriteRepository.save(favorite));
     }
 
-    private FavoriteBeverageResponse addCustomFavorite(User user, Long beverageId) {
-        CustomBeverage beverage = customBeverageService.getByIdAndValidateOwnership(beverageId, user);
-
+    @Transactional
+    public FavoriteBeverageResponse addCustomFavorite(User user, CustomBeverage beverage) {
         validateNotDuplicateCustom(user, beverage);
 
         FavoriteBeverage favorite = FavoriteBeverage.fromCustom(

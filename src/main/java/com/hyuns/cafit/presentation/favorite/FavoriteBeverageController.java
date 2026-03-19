@@ -5,7 +5,7 @@ import com.hyuns.cafit.domain.user.User;
 import com.hyuns.cafit.dto.favorite.FavoriteBeverageResponse;
 import com.hyuns.cafit.dto.favorite.FavoriteCreateRequest;
 import com.hyuns.cafit.dto.favorite.FavoriteOrderUpdateRequest;
-import com.hyuns.cafit.application.favorite.FavoriteBeverageService;
+import com.hyuns.cafit.application.favorite.FavoriteBeverageFacade;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -17,21 +17,21 @@ import java.util.List;
 @RequestMapping("/api/favorites")
 @RequiredArgsConstructor
 public class FavoriteBeverageController {
-    private final FavoriteBeverageService favoriteService;
+    private final FavoriteBeverageFacade favoriteFacade;
 
     @PostMapping
     public ResponseEntity<FavoriteBeverageResponse> addFavorite(
             @Login User user,
             @Valid @RequestBody FavoriteCreateRequest request
     ) {
-        return ResponseEntity.ok(favoriteService.addFavorite(user, request));
+        return ResponseEntity.ok(favoriteFacade.addFavorite(user, request));
     }
 
     @GetMapping
     public ResponseEntity<List<FavoriteBeverageResponse>> getFavorites(
             @Login User user
     ) {
-        return ResponseEntity.ok(favoriteService.getFavorites(user));
+        return ResponseEntity.ok(favoriteFacade.getFavorites(user));
     }
 
     @DeleteMapping("/{favoriteId}")
@@ -39,7 +39,7 @@ public class FavoriteBeverageController {
             @PathVariable Long favoriteId,
             @Login User user
     ) {
-        favoriteService.deleteFavorite(favoriteId, user);
+        favoriteFacade.deleteFavorite(favoriteId, user);
         return ResponseEntity.noContent().build();
     }
 
@@ -48,7 +48,7 @@ public class FavoriteBeverageController {
             @Login User user,
             @Valid @RequestBody FavoriteOrderUpdateRequest request
     ) {
-        favoriteService.updateOrder(user, request.favoriteIds());
+        favoriteFacade.updateOrder(user, request.favoriteIds());
         return ResponseEntity.ok().build();
     }
 }

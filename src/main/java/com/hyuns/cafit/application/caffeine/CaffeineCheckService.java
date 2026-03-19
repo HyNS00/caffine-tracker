@@ -1,9 +1,5 @@
 package com.hyuns.cafit.application.caffeine;
 
-import com.hyuns.cafit.application.beverage.CustomBeverageService;
-import com.hyuns.cafit.application.beverage.PresetBeverageService;
-import com.hyuns.cafit.domain.beverage.CustomBeverage;
-import com.hyuns.cafit.domain.beverage.PresetBeverage;
 import com.hyuns.cafit.domain.intake.CaffeineIntake;
 import com.hyuns.cafit.domain.intake.repository.CaffeineIntakeRepository;
 import com.hyuns.cafit.domain.user.User;
@@ -26,12 +22,10 @@ import static com.hyuns.cafit.global.util.NumberUtils.round;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class CaffeineCheckService {
+
     private final Clock clock;
     private final CaffeineDecayCalculator decayCalculator;
     private final CaffeineIntakeRepository intakeRepository;
-    private final PresetBeverageService presetBeverageService;
-    private final CustomBeverageService customBeverageService;
-
 
     public CurrentCaffeineResponse getCurrentStatus(User user) {
         LocalDateTime now = LocalDateTime.now(clock);
@@ -45,18 +39,7 @@ public class CaffeineCheckService {
         return new CurrentCaffeineResponse(status, settings, recommendation);
     }
 
-
-    public DrinkCheckResponse checkPresetBeverage(User user, Long beverageId) {
-        PresetBeverage beverage = presetBeverageService.getById(beverageId);
-        return buildDrinkCheckResponse(user, BeverageInfo.from(beverage));
-    }
-
-    public DrinkCheckResponse checkCustomBeverage(User user, Long beverageId) {
-        CustomBeverage beverage = customBeverageService.getById(beverageId);
-        return buildDrinkCheckResponse(user, BeverageInfo.from(beverage));
-    }
-
-    private DrinkCheckResponse buildDrinkCheckResponse(User user, BeverageInfo beverageInfo) {
+    public DrinkCheckResponse checkBeverage(User user, BeverageInfo beverageInfo) {
         LocalDateTime now = LocalDateTime.now(clock);
         List<CaffeineIntake> intakes = getRecentIntakes(user, now);
         double todayTotalMg = getTodayTotalIntake(user);
@@ -84,7 +67,6 @@ public class CaffeineCheckService {
             double todayTotalMg,
             double additionalCaffeine
     ) {
-
         double currentMg = decayCalculator.caffeineLevelAt(intakes, now, user.getCaffeineHalfLife()) + additionalCaffeine;
         double predictedAtBedtimeMg = calculatePredictedAtBedtime(user, intakes, now, additionalCaffeine);
         double totalMg = todayTotalMg + additionalCaffeine;

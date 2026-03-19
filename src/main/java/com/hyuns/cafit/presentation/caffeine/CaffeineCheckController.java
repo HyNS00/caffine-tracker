@@ -4,7 +4,7 @@ import com.hyuns.cafit.global.security.Login;
 import com.hyuns.cafit.domain.user.User;
 import com.hyuns.cafit.dto.caffeine.CurrentCaffeineResponse;
 import com.hyuns.cafit.dto.caffeine.DrinkCheckResponse;
-import com.hyuns.cafit.application.caffeine.CaffeineCheckService;
+import com.hyuns.cafit.application.caffeine.CaffeineCheckFacade;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,13 +13,13 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/caffeine")
 @RequiredArgsConstructor
 public class CaffeineCheckController {
-    private final CaffeineCheckService caffeineCheckService;
+    private final CaffeineCheckFacade caffeineCheckFacade;
 
     @GetMapping("/status")
     public ResponseEntity<CurrentCaffeineResponse> getCurrentStatus(
             @Login User user
     ) {
-        CurrentCaffeineResponse response = caffeineCheckService.getCurrentStatus(user);
+        CurrentCaffeineResponse response = caffeineCheckFacade.getCurrentStatus(user);
         return ResponseEntity.ok(response);
     }
 
@@ -28,7 +28,7 @@ public class CaffeineCheckController {
             @Login User user,
             @PathVariable Long beverageId
     ) {
-        DrinkCheckResponse response = caffeineCheckService.checkPresetBeverage(user, beverageId);
+        DrinkCheckResponse response = caffeineCheckFacade.checkPresetBeverage(user, beverageId);
         return ResponseEntity.ok(response);
     }
 
@@ -37,7 +37,7 @@ public class CaffeineCheckController {
             @Login User user,
             @PathVariable Long beverageId
     ) {
-        DrinkCheckResponse response = caffeineCheckService.checkCustomBeverage(user, beverageId);
+        DrinkCheckResponse response = caffeineCheckFacade.checkCustomBeverage(user, beverageId);
         return ResponseEntity.ok(response);
     }
 }
