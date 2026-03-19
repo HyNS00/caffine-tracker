@@ -58,8 +58,6 @@ public class CaffeineStatisticsService {
                 user.getDailyCaffeineLimit()
         );
     }
-    // top3 음료
-    // todo 나중에 statistic 도메인 도입해야함
     public List<TopBeverageStat> getTopBeverages(User user, int days) {
         LocalDateTime end = LocalDateTime.now(clock);
         LocalDateTime start = LocalDate.now(clock).minusDays(days - 1).atStartOfDay();

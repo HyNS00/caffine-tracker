@@ -10,7 +10,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "favoriate_beverages",
+@Table(name = "favorite_beverages",
         uniqueConstraints = {
                 @UniqueConstraint(columnNames = {"user_id", "preset_beverage_id"}),
                 @UniqueConstraint(columnNames = {"user_id", "custom_beverage_id"})
