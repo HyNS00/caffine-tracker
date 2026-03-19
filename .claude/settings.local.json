@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep -E \"\\\\.\\(java\\)$\")",
+      "Bash(gh auth:*)",
+      "Bash(grep -l \"@IntegrationTest\" \"/Users/hyso/Desktop/팀프로젝트/statistics-server/src/test/java/com/prism/statistics/application\"/*.java)"
+    ]
+  }
+}
