@@ -7,8 +7,8 @@ import com.hyuns.cafit.application.auth.dto.LoginRequest;
 import com.hyuns.cafit.application.auth.dto.SignUpRequest;
 import com.hyuns.cafit.global.exception.DuplicateEmailException;
 import com.hyuns.cafit.global.exception.LoginFailedException;
-
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class AuthService {
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Transactional
     public AuthResponse signup(SignUpRequest request) {
@@ -26,7 +27,7 @@ public class AuthService {
 
         User user = new User(
                 request.email(),
-                request.password(),
+                passwordEncoder.encode(request.password()),
                 request.name()
         );
 
@@ -39,7 +40,7 @@ public class AuthService {
         User user = userRepository.findByEmail(request.email())
                 .orElseThrow(LoginFailedException::new);
 
-        if (!user.isPasswordMatch(request.password())) {
+        if (!user.isPasswordMatch(request.password(), passwordEncoder)) {
             throw new LoginFailedException();
         }
 

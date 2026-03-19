@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalTime;
 
@@ -57,8 +58,8 @@ public class User extends BaseTimeEntity {
         this.targetSleepCaffeine = 50.0;
     }
 
-    public boolean isPasswordMatch(String rawPassword) {
-        return this.password.equals(rawPassword);
+    public boolean isPasswordMatch(String rawPassword, PasswordEncoder passwordEncoder) {
+        return passwordEncoder.matches(rawPassword, this.password);
     }
 
 }
