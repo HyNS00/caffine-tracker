@@ -1,7 +1,7 @@
 package com.hyuns.cafit.infrastructure.beverage.persistence;
 
 import com.hyuns.cafit.domain.beverage.PresetBeverage;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.repository.ListCrudRepository;
 
-public interface PresetBeverageJpaRepository extends JpaRepository<PresetBeverage, Long> {
+public interface PresetBeverageJpaRepository extends ListCrudRepository<PresetBeverage, Long> {
 }

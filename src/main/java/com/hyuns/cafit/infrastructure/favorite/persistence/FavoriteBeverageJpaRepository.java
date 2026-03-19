@@ -4,9 +4,9 @@ import com.hyuns.cafit.domain.beverage.CustomBeverage;
 import com.hyuns.cafit.domain.beverage.PresetBeverage;
 import com.hyuns.cafit.domain.favorite.FavoriteBeverage;
 import com.hyuns.cafit.domain.user.User;
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.ListCrudRepository;
 
-public interface FavoriteBeverageJpaRepository extends CrudRepository<FavoriteBeverage, Long> {
+public interface FavoriteBeverageJpaRepository extends ListCrudRepository<FavoriteBeverage, Long> {
 
     boolean existsByUserAndPresetBeverage(User user, PresetBeverage presetBeverage);
 
