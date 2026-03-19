@@ -6,7 +6,9 @@
 **비전**: 사용자의 일일 카페인 섭취를 지능적으로 관리하고, 반감기 기반 잔존량 예측을 통해 수면 품질을 최적화하는 웹 서비스
 **대상 사용자**: 커피를 자주 마시는 직장인, 카페인에 민감한 사람, 수면 품질 개선을 원하는 건강 관심층
 
-## 2. 현재 상태 (As-Is)
+## 2. 현재 상태
+
+### 완료된 기능
 
 | 항목 | 상태 |
 |------|------|
@@ -19,13 +21,34 @@
 | 통계 | 일간/주간 카페인 타임라인 |
 | 즐겨찾기 | 프리셋/커스텀 즐겨찾기 + 순서 변경 |
 | 프론트엔드 | 바닐라 HTML/CSS/JS + Chart.js |
-| 테스트 | 컨텍스트 로드 테스트만 존재 |
 
 User 엔티티에 이미 개인화 필드 존재: `dailyCaffeineLimit`(400mg), `caffeineHalfLife`(5.0h), `bedTime`(23:00), `targetSleepCaffeine`(50mg)
 
+### 완료된 리팩토링
+
+| 항목 | Issue | 상태 |
+|------|-------|------|
+| BaseEntity + BaseTimeEntity + JPA Auditing | #3 | ✅ |
+| 도메인별 ErrorCode enum + ExceptionResponse | #3 | ✅ |
+| 패키지 구조 전환 (Layered Architecture) | #4 | ✅ |
+| Repository Adapter 패턴 | #4 | ✅ |
+| Service Facade 분리 (CaffeineCheck, FavoriteBeverage) | #4 | ✅ |
+| QueryDSL 의존성 + JPAQueryFactory 빈 등록 | #4 | ✅ |
+| ListCrudRepository 통일 | #4 | ✅ |
+
+### 남은 기술 부채
+
+| 항목 | Issue |
+|------|-------|
+| dto/ 패키지가 아직 application/ 하위로 미이동 | #5 |
+| 평문 비밀번호 → BCrypt 암호화 | #5 |
+| FavoriteBeverage 테이블명 오타 | #5 |
+| 미사용 import, TODO 주석 정리 | #5 |
+| 테스트 부재 (컨텍스트 로드 테스트만 존재) | Phase 1 |
+
 ## 3. 기능 우선순위
 
-### P0 - MVP 필수
+### P0 - MVP 필수 (Phase 3)
 
 | ID | 기능 | 설명 |
 |----|------|------|
@@ -33,22 +56,21 @@ User 엔티티에 이미 개인화 필드 존재: `dailyCaffeineLimit`(400mg), `
 | F-02 | 수면 기록 | 수면 시간/품질 기록 → 카페인-수면 상관관계 분석 데이터 수집 |
 | F-03 | 카페인 섭취 경고 | 수면 시간 기반 "카페인 마감 시간" 계산 + 알림 |
 
-### P1 - MVP 확장
+### P1 - MVP 확장 (Phase 4~5)
 
-| ID | 기능 | 설명 |
-|----|------|------|
-| F-04 | Next.js 프론트엔드 | Next.js + Tailwind CSS로 전환 |
-| F-05 | 주간 이메일 리포트 | 매주 월요일 카페인 통계 이메일 발송 |
-| F-06 | 민감도 자동 추천 | 누적 카페인+수면 데이터 기반 민감도 자동 조정 |
+| ID | 기능 | Phase |
+|----|------|-------|
+| F-04 | 주간 이메일 리포트 | Phase 4 |
+| F-05 | Next.js 프론트엔드 | Phase 5 |
+| F-06 | 민감도 자동 추천 | 향후 |
 
-### P2 - 향후 확장
+### P2 - 향후 확장 (Phase 6~7)
 
-| ID | 기능 | 설명 |
-|----|------|------|
-| F-07 | JWT 인증 | 세션 → JWT(Access + Refresh Token) 전환 |
-| F-08 | OAuth2 소셜 로그인 | Google/Kakao 로그인 |
-| F-09 | QueryDSL | 복잡한 통계 쿼리를 QueryDSL로 전환 |
-| F-10 | MCP 통합 | AI 터미널에서 "나 지금 커피 마셔도 돼?" 질의 |
+| ID | 기능 | Phase |
+|----|------|-------|
+| F-07 | JWT 인증 | Phase 6 |
+| F-08 | OAuth2 소셜 로그인 | Phase 6 |
+| F-09 | MCP 통합 | Phase 7 |
 
 ## 4. 비기능 요구사항
 

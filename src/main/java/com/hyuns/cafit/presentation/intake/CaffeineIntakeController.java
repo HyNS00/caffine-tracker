@@ -2,8 +2,8 @@ package com.hyuns.cafit.presentation.intake;
 
 import com.hyuns.cafit.global.security.Login;
 import com.hyuns.cafit.domain.user.User;
-import com.hyuns.cafit.dto.intake.CaffeineIntakeCreateRequest;
-import com.hyuns.cafit.dto.intake.CaffeineIntakeResponse;
+import com.hyuns.cafit.application.intake.dto.CaffeineIntakeCreateRequest;
+import com.hyuns.cafit.application.intake.dto.CaffeineIntakeResponse;
 import com.hyuns.cafit.application.intake.CaffeineIntakeService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

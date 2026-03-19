@@ -2,9 +2,9 @@ package com.hyuns.cafit.application.auth;
 
 import com.hyuns.cafit.domain.user.User;
 import com.hyuns.cafit.domain.user.repository.UserRepository;
-import com.hyuns.cafit.dto.auth.AuthResponse;
-import com.hyuns.cafit.dto.auth.LoginRequest;
-import com.hyuns.cafit.dto.auth.SignUpRequest;
+import com.hyuns.cafit.application.auth.dto.AuthResponse;
+import com.hyuns.cafit.application.auth.dto.LoginRequest;
+import com.hyuns.cafit.application.auth.dto.SignUpRequest;
 import com.hyuns.cafit.global.exception.DuplicateEmailException;
 import com.hyuns.cafit.global.exception.LoginFailedException;
 

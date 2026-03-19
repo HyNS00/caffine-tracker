@@ -4,7 +4,7 @@ import com.hyuns.cafit.application.caffeine.CaffeineDecayCalculator;
 import com.hyuns.cafit.domain.intake.CaffeineIntake;
 import com.hyuns.cafit.domain.intake.repository.CaffeineIntakeRepository;
 import com.hyuns.cafit.domain.user.User;
-import com.hyuns.cafit.dto.statistics.*;
+import com.hyuns.cafit.application.statistics.dto.*;
 import com.hyuns.cafit.infrastructure.intake.persistence.CaffeineIntakeQueryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
