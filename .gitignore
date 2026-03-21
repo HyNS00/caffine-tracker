@@ -37,3 +37,9 @@ out/
 
 ### Application Secret Files ###
 **/application-secret.yaml
+
+### Claude Code ###
+CLAUDE.md
+PRD.md
+plan.md
+docs/decisions.md
