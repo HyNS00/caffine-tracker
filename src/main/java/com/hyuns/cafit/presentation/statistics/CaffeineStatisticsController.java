@@ -2,9 +2,9 @@ package com.hyuns.cafit.presentation.statistics;
 
 import com.hyuns.cafit.global.security.Login;
 import com.hyuns.cafit.domain.user.User;
-import com.hyuns.cafit.dto.statistics.CaffeineTimelineResponse;
-import com.hyuns.cafit.dto.statistics.DailyStatisticsResponse;
-import com.hyuns.cafit.dto.statistics.TopBeverageStat;
+import com.hyuns.cafit.application.statistics.dto.CaffeineTimelineResponse;
+import com.hyuns.cafit.application.statistics.dto.DailyStatisticsResponse;
+import com.hyuns.cafit.application.statistics.dto.TopBeverageStat;
 import com.hyuns.cafit.application.statistics.CaffeineStatisticsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

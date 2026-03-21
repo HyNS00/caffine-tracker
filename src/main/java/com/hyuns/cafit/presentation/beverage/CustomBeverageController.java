@@ -2,9 +2,9 @@ package com.hyuns.cafit.presentation.beverage;
 
 import com.hyuns.cafit.global.security.Login;
 import com.hyuns.cafit.domain.user.User;
-import com.hyuns.cafit.dto.beverage.CustomBeverageCreateRequest;
-import com.hyuns.cafit.dto.beverage.CustomBeverageResponse;
-import com.hyuns.cafit.dto.beverage.CustomBeverageUpdateRequest;
+import com.hyuns.cafit.application.beverage.dto.CustomBeverageCreateRequest;
+import com.hyuns.cafit.application.beverage.dto.CustomBeverageResponse;
+import com.hyuns.cafit.application.beverage.dto.CustomBeverageUpdateRequest;
 import com.hyuns.cafit.application.beverage.CustomBeverageService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

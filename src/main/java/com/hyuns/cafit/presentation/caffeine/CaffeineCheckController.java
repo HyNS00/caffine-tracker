@@ -2,8 +2,8 @@ package com.hyuns.cafit.presentation.caffeine;
 
 import com.hyuns.cafit.global.security.Login;
 import com.hyuns.cafit.domain.user.User;
-import com.hyuns.cafit.dto.caffeine.CurrentCaffeineResponse;
-import com.hyuns.cafit.dto.caffeine.DrinkCheckResponse;
+import com.hyuns.cafit.application.caffeine.dto.CurrentCaffeineResponse;
+import com.hyuns.cafit.application.caffeine.dto.DrinkCheckResponse;
 import com.hyuns.cafit.application.caffeine.CaffeineCheckFacade;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

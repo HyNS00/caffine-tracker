@@ -1,7 +1,7 @@
 package com.hyuns.cafit.infrastructure.intake.persistence;
 
 import com.hyuns.cafit.domain.user.User;
-import com.hyuns.cafit.dto.statistics.TopBeverageStat;
+import com.hyuns.cafit.application.statistics.dto.TopBeverageStat;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;

@@ -2,9 +2,9 @@ package com.hyuns.cafit.presentation.favorite;
 
 import com.hyuns.cafit.global.security.Login;
 import com.hyuns.cafit.domain.user.User;
-import com.hyuns.cafit.dto.favorite.FavoriteBeverageResponse;
-import com.hyuns.cafit.dto.favorite.FavoriteCreateRequest;
-import com.hyuns.cafit.dto.favorite.FavoriteOrderUpdateRequest;
+import com.hyuns.cafit.application.favorite.dto.FavoriteBeverageResponse;
+import com.hyuns.cafit.application.favorite.dto.FavoriteCreateRequest;
+import com.hyuns.cafit.application.favorite.dto.FavoriteOrderUpdateRequest;
 import com.hyuns.cafit.application.favorite.FavoriteBeverageFacade;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

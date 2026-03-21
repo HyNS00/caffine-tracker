@@ -10,7 +10,6 @@
 ## 개발 문서
 - `PRD.md`: 제품 요구사항 정의서 (기능 우선순위, 비기능 요구사항)
 - `plan.md`: Phase별 개발 계획 (Issue 단위, 체크박스 진행 관리)
-- `refactoring-plan.md`: 리팩토링 상세 계획
 
 ## 코드 컨벤션
 - `backend-code-convention.md` 참조 (Google Java Convention 기반, 4스페이스, 120자 제한)
@@ -21,9 +20,14 @@
   - 예: `feat: 카페인 민감도 설문 API 구현`
   - 예: `refactor: 패키지 구조 변경 (controller → presentation)`
 - 브랜치 네이밍: `{type}/issue-{번호}-{설명}` (plan.md의 Issue 번호 기반)
-  - 예: `refactor/issue-1-base-entity`, `feature/issue-10-sensitivity`
+  - 예: `refactor/issue-3-base-entity`, `feature/issue-15-sensitivity`
 - PR 단위: Issue 1개 = PR 1개, Phase 완료 시 사용자 확인 후 다음 Phase 진행
 - 커밋 메시지에 Claude 관련 문구(Co-Authored-By 등)를 포함하지 않는다
+
+## 완료된 리팩토링 (Phase 0)
+- Issue #3: BaseEntity + BaseTimeEntity + ErrorCode 체계 ✅
+- Issue #4: 패키지 구조 + Facade + Adapter + QueryDSL ✅
+- Issue #5: 코드 스타일 + BCrypt + DTO 이동 (미착수)
 
 ## Spring Security 마이그레이션 계획
 
@@ -33,9 +37,9 @@
 - 주요 파일: SecurityConfig, TokenConfig, OAuth2SuccessHandler, OAuth2AuthenticationFilter 등
 
 ### 단계별 적용
-1. **1단계**: SecurityConfig + BCrypt (세션 기반 유지, 기존 LoginFilter를 Security 필터 체인으로 교체)
-2. **2단계**: JWT 토큰 방식 전환 (React 프론트 분리 시)
-3. **3단계**: OAuth2 소셜 로그인 추가
+1. **Phase 2**: SecurityConfig + BCrypt (세션 기반 유지, 기존 LoginFilter를 Security 필터 체인으로 교체)
+2. **Phase 6**: JWT 토큰 방식 전환 (Next.js 프론트 분리 후)
+3. **Phase 6**: OAuth2 소셜 로그인 추가
 
 ### 현재 → Security 전환 매핑
 | 현재 | Security 전환 후 |
@@ -46,12 +50,7 @@
 | 평문 비밀번호 | BCryptPasswordEncoder |
 | 없음 | CORS/CSRF 설정 |
 
-## 리팩토링 계획 (컨벤션 적용)
-
-### 상세 계획 파일
-- `refactoring-plan.md` 참조
-
-## 카페인 민감도 기능 (Phase 3, Issue #9)
+## 카페인 민감도 기능 (Phase 3, Issue #15)
 
 ### 기능 개요
 - 회원가입 후 민감도 설문 (5개 질문)

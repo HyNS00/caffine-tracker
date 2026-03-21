@@ -5,7 +5,7 @@ import com.hyuns.cafit.domain.beverage.PresetBeverage;
 import com.hyuns.cafit.domain.favorite.FavoriteBeverage;
 import com.hyuns.cafit.domain.favorite.repository.FavoriteBeverageRepository;
 import com.hyuns.cafit.domain.user.User;
-import com.hyuns.cafit.dto.favorite.FavoriteBeverageResponse;
+import com.hyuns.cafit.application.favorite.dto.FavoriteBeverageResponse;
 import com.hyuns.cafit.global.exception.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
