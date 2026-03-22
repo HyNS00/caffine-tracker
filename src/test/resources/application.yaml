@@ -6,12 +6,17 @@ spring:
     password:
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: none
     show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
   sql:
     init:
-      mode: never
+      mode: always
+      schema-locations: classpath:sql/schema.sql
 
 logging:
   level:
     root: INFO
+    org.hibernate.SQL: DEBUG
